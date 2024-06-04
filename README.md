@@ -1,5 +1,5 @@
 # Flying Company
-Repository for the Introduction to Computer Science group project
+Repository for the Introduction to Computer Science group project.
 
 ## Languages used:
 
