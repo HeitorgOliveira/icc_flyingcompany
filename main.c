@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef char * string;
 //TODO: criar classe reserva. Os atributos são: nome, sobrenome, cpf, data, numero do voo, id, numero de assento, classe, valor, origem e destino.
