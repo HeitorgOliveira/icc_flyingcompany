@@ -1,20 +1,23 @@
 #include <stdio.h>
 
+typedef char * string;
 //TODO: criar classe reserva. Os atributos são: nome, sobrenome, cpf, data, numero do voo, id, numero de assento, classe, valor, origem e destino.
+typedef struct 
+{
+    string nome, sobrenome, cpf, data, numassento, classe, origem, destino;
+    float valor;
+}Reserva;
 //alguns dados são o mesmo para todos os outros. 
 
 void AV(int assentos, float valor); // Implementar AV
-void RR(char *nome, char *sobrenome, char* cpf, char * data, int idvoo, char* assento, char* classe, float valor, char * origem, char *destino); // Implementar RR
-Reserva CR(char *cpf); //Implementar CR
-Reserva MR(char *cpf, char* nome, char *sobrenome, char *cpf, char *assento); // Implementar MR
-void CA(char * cpf); // Implementar CA
+void RR(string nome, string sobrenome, string cpf, string  data, int idvoo, string assento, string classe, float valor, string  origem, string destino); // Implementar RR
+Reserva CR(string cpf); //Implementar CR
+Reserva MR(string cpf, string nome, string sobrenome, string assento); // Implementar MR
+void CA(string  cpf); // Implementar CA
 Reserva * FD();
 Reserva * FV();
 
 int main(void)
 {
-    do
-    {
-        /* code */
-    } while (/* condition */);
+    
 }
