@@ -22,10 +22,10 @@ typedef struct{
     char* destino;
 } Dados;
 
-void* aloca(int N, int J);
-Valor AV(int *assentos, Valor valores); 
+void * aloca(int N, int J);
+Valor AV(int *assentos); 
 void RR(Dados *cadastro, int cont);
-void CR(char *cpf); //Implementar CR
+void CR(int assentos, char* cadastro);
 void MR(char *cpf, char* nome, char *sobrenome, char *cpf, char *assento); // Implementar MR
 void CA(char * cpf); // Implementar CA
 void * FD();
@@ -34,7 +34,7 @@ void * FV();
 void* aloca(int N, int J){
     void *p;
 
-    p= calloc(N*J);
+    p= malloc(N*J);
 
     if(p==NULL){
         printf("Sem espaço");
@@ -45,7 +45,7 @@ void* aloca(int N, int J){
 return(p);
 }
 
-Valor AV(int *assentos, Valor valores){
+Valor AV(int *assentos){
     int assentos;
     Valor valores;
 
@@ -104,7 +104,35 @@ void RR(Dados *cadastro, int cont){
     strcpy(cadastro[cont].destino, p);
     free(p);
     
-return;
+}
+
+void CR(int assentos, char* cadastro){
+    char cpf[15];
+
+    scanf("%s", cpf);
+
+    printf("\n");
+
+    for(int i=0; i<assentos; i++){
+        if(strcmp(cpf, cadastro[i].cpf)==0){
+
+            printf("%s\n", cadastro[i].cpf);
+            printf("%s %s\n", cadastro[i].nome, cadastro[i].sobrenome);
+            printf("%d/%d/%d\n", cadastro[i].dia, cadastro[i].mes, cadastro[i].ano);
+            printf("Voo: %s\n", cadastro[i].idvoo);
+            printf("Assento: %s\n", cadastro[i].assento);
+            printf("Classe: %s\n", cadastro[i].classe);
+            printf("Trecho: %s %s\n", cadastro[i].origem, cadastro[i].destino);
+            printf("Valor %.2f\n", cadastro[i].valor);
+
+            for(int j=0; j<50; j++){
+
+                printf("-");
+
+            }
+            printf("\n");
+        }
+    }
 }
 
 int main(void){
@@ -118,7 +146,7 @@ int main(void){
         int assentos;
         Valor valores;
 
-        valores= AV(&assentos, valores);
+        valores= AV(&assentos);
     }
 
     do{
@@ -133,7 +161,12 @@ int main(void){
             cont++;
         }
 
-    }while(strcmp(comando, "FA")!=0 && strcmp(comando, "FV")!=0 && cont<assentos);
+        if(strcmp(comando, "CV")==0){
 
+            CV(assentos, cadastro);
+        }
 
+    }while(strcmp(comando, "FD")!=0 && strcmp(comando, "FV")!=0 && cont<assentos);
+
+    return 0;
 }
