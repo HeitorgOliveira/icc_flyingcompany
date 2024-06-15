@@ -22,7 +22,7 @@ typedef struct{
     char *destino;
 } Dados;
 
-//Protótipo das Funções:
+//Protótipo das Funções: tem que colocar os dados adquiridos no arquivo
 void *aloca(int N, int J);
 Valor AV(int *assentos); 
 void RR(Dados *cadastro, int cont, Valor valores);
@@ -43,7 +43,7 @@ void* aloca(int N, int J){
     return(p);
 }
 
-Valor AV(int *assentos){
+Valor AV(int *assentos){ 
     Valor valores;
 
     scanf("%d %f %f", assentos, &valores.executiva, &valores.economica);
@@ -63,7 +63,11 @@ void RR(Dados *cadastro, int cont, Valor valores){
     if( cadastro[cont].classe == 'executiva' && cadastro[cont].valor == valores.executiva || 
         cadastro[cont].classe == 'economica' && cadastro[cont].valor == valores.economica){
         
-        p = (char*)aloca(sizeof(char), 700);
+        if( cadastro[cont].dia == cadastro[0].dia && cadastro[cont].mes == cadastro[0].mes && cadastro[cont].ano == cadastro[0].ano &&
+            cadastro[cont].idvoo == cadastro[0].idvoo &&
+            cadastro[cont].origem == cadastro[0].origem && cadastro[cont].destino == cadastro[0].destino){
+
+                p = (char*)aloca(sizeof(char), 700);
         scanf(" %s", p);
         cadastro[cont].nome = (char*)aloca(sizeof(char), strlen(p)+1);
         strcpy(cadastro[cont].nome, p);
@@ -102,7 +106,7 @@ void RR(Dados *cadastro, int cont, Valor valores){
         cadastro[cont].destino = (char*)aloca(sizeof(char), strlen(p)+1);
         strcpy(cadastro[cont].destino, p);
         free(p);
-
+        }
     } else {
         printf("Erro nos dados da reserva.\n");
     }
