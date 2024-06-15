@@ -28,7 +28,7 @@ Valor AV(int *assentos);
 void RR(Dados *cadastro, int cont);
 void CR(int assentos, Dados *cadastro);
 void MR(Dados *cadastro, int assentos);
-void CA(char * cpf); // Implementar CA
+void CA(Dados *cadastro, int assentos);
 void * FD(); // implementar FD
 void * FV(); // implementar FV
 
@@ -129,6 +129,7 @@ void CR(int assentos, Dados *cadastro){
                 printf("-");
             }
             printf("\n");
+            break;
         }
     }
 }
@@ -160,6 +161,7 @@ void MR(Dados *cadastro, int assentos){
                 printf("-");
             }
             printf("\n");
+            break;
         }
     }
 
@@ -168,15 +170,28 @@ void MR(Dados *cadastro, int assentos){
     }
 }
 
+void CA(Dados *cadastro, int assentos){
+    char cpf[15];
+
+    scanf("%s", cpf);
+
+    for(int i = 0; i < assentos; i++){
+        if(strcmp(cpf, cadastro[i].cpf) == 0){
+            // cancelar essa reserva
+            break;
+        }
+    }
+}
+
 int main(void){
     char comando[3];
     Dados *cadastro;
     int cont = 0;
+    int assentos;
 
     scanf("%s", comando);
 
     if(strcmp(comando, "AV") == 0){
-        int assentos;
         Valor valores;
 
         valores = AV(&assentos);
@@ -201,7 +216,12 @@ int main(void){
             MR(cadastro, assentos);
         }
 
+        if(strcmp(comando, "CA") == 0){
+            CA(cadastro, assentos);
+        }
+
     }while(strcmp(comando, "FD") != 0 || strcmp(comando, "FV") != 0 || cont < assentos);
 
     return 0;
+    free();
 }
