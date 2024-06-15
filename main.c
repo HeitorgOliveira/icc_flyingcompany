@@ -5,7 +5,7 @@
 typedef struct{
     float executiva;
     float economica;
-} Valor;
+} Passagem;
 
 typedef struct{
     char *nome;
@@ -17,20 +17,69 @@ typedef struct{
     char *idvoo;
     char assento[4];
     char classe[10];
-    float valor;
+    float Passagem;
     char *origem;
     char *destino;
-} Dados;
+} Reserva;
 
-// Protótipo das Funções: tem que colocar os dados adquiridos no arquivo
+// Protótipo das Funções: tem que colocar os Reserva adquiridos no arquivo
 void *aloca(int N, int J);
-Valor AV(int *assentos);
-void RR(Dados *cadastro, int cont, Valor valores, int assentos);
-void CR(int assentos, Dados *cadastro);
-void MR(Dados *cadastro, int assentos);
-void CA(Dados *cadastro, int assentos);
+void AV(int assentos, float Passagem_economica, float Passagem_executiva);
+void RR(Reserva *cadastro, int cont, Passagem Passagemes, int assentos);
+void CR(int assentos, Reserva *cadastro);
+void MR(Reserva *cadastro, int assentos);
+void CA(Reserva *cadastro, int assentos);
 void FD(); // implementar FD
-void FV(Dados *cadastro, int assentos);
+void FV(Reserva *cadastro, int assentos);
+
+
+int main(void){
+    char comando[3];
+    Passagem Passagemes;
+    Reserva *cadastro;
+    int cont = 0;
+
+    scanf(" %s", comando);
+
+    if (strcmp(comando, "AV") == 0){
+        int assentos;
+        float Passagem_economica, Passagem_executiva;
+        scanf("%d %f %f", &assentos, &Passagem_economica, &Passagem_executiva);
+        AV(assentos, Passagem_economica, Passagem_executiva);
+    }
+
+    /*do{
+        scanf("%s", comando);
+
+        if (strcmp(comando, "RR") == 0){
+            cadastro = (Reserva *)aloca(sizeof(Reserva), assentos);
+
+            RR(cadastro, cont, Passagemes, assentos);
+            cont++;
+        }
+
+        if (strcmp(comando, "CR") == 0){
+            CR(assentos, cadastro);
+        }
+
+        if (strcmp(comando, "MR") == 0){
+            MR(cadastro, assentos);
+        }
+
+        if (strcmp(comando, "CA") == 0){
+            CA(cadastro, assentos);
+        }
+
+    } while (strcmp(comando, "FD") != 0 || strcmp(comando, "FV") != 0 || cont < assentos);
+
+    if (strcmp(comando, "FV") == 0 || cont >= assentos){
+        FV(cadastro, assentos);
+    } else if (strcmp(comando, "FD") == 0){
+        FD();
+    }*/
+
+    return 0;
+}
 
 void *aloca(int N, int J){
     void *p = malloc(N * J);
@@ -43,25 +92,26 @@ void *aloca(int N, int J){
     return (p);
 }
 
-Valor AV(int *assentos){ // criar um novo arquivo
-    Valor valores;
+void AV(int assentos, float Passagem_economica, float Passagem_executiva){ // criar um novo arquivo
 
-    scanf("%d %f %f", assentos, &valores.executiva, &valores.economica);
-
-    FILE *arquivo = fopen("info_voo.txt", "w");
-    if (arquivo == NULL){
-        printf("Erro na abertura do arquivo!");
+    printf("Assentos: %d\nPassagem executiva: %f\nPassagem economica: %f\n", assentos, Passagem_executiva, Passagem_economica);
+    FILE *arquivo_precos = fopen("precos.txt", "w");
+    if (arquivo_precos == NULL){
+        printf("Erro na abertura do arquivo!\n");
+        exit(1);
     }
-
-    fclose(arquivo);
-    return valores;
+    Passagem Passagemes;
+    Passagemes.economica = Passagem_economica;
+    Passagemes.executiva = Passagem_executiva;
+    fprintf(arquivo_precos, "Economica: %.2f\nExecutiva: %.2f", Passagem_economica, Passagem_executiva);
+    fclose(arquivo_precos);
 }
 
-void RR(Dados *cadastro, int cont, Valor valores, int assentos){ // ler e escrever no arquivo
+void RR(Reserva *cadastro, int cont, Passagem Passagemes, int assentos){ // ler e escrever no arquivo
     char *p;
 
-    if ((strcmp(cadastro[cont].classe, "executiva") == 0 && cadastro[cont].valor == valores.executiva) ||
-        (strcmp(cadastro[cont].classe, "economica") == 0 && cadastro[cont].valor == valores.economica)){
+    if ((strcmp(cadastro[cont].classe, "executiva") == 0 && cadastro[cont].Passagem == Passagemes.executiva) ||
+        (strcmp(cadastro[cont].classe, "economica") == 0 && cadastro[cont].Passagem == Passagemes.economica)){
 
         if (cadastro[cont].dia == cadastro[0].dia && cadastro[cont].mes == cadastro[0].mes && cadastro[cont].ano == cadastro[0].ano &&
             strcmp(cadastro[cont].idvoo, cadastro[0].idvoo) == 0 &&
@@ -96,7 +146,7 @@ void RR(Dados *cadastro, int cont, Valor valores, int assentos){ // ler e escrev
 
                     scanf(" %s", cadastro[cont].classe);
 
-                    scanf(" %f", &cadastro[cont].valor);
+                    scanf(" %f", &cadastro[cont].Passagem);
 
                     p = (char *)aloca(sizeof(char), 5);
                     scanf(" %s", p);
@@ -113,11 +163,11 @@ void RR(Dados *cadastro, int cont, Valor valores, int assentos){ // ler e escrev
             }
         }
     } else {
-        printf("Erro nos dados da reserva.\n");
+        printf("Erro nos Reserva da reserva.\n");
     }
 }
 
-void CR(int assentos, Dados *cadastro){ //ler arquivo 
+void CR(int assentos, Reserva *cadastro){ //ler arquivo 
     char cpf[15];
 
     scanf("%s", cpf);
@@ -132,7 +182,7 @@ void CR(int assentos, Dados *cadastro){ //ler arquivo
             printf("Assento: %s\n", cadastro[i].assento);
             printf("Classe: %s\n", cadastro[i].classe);
             printf("Trecho: %s %s\n", cadastro[i].origem, cadastro[i].destino);
-            printf("Valor %.2f\n", cadastro[i].valor);
+            printf("Passagem %.2f\n", cadastro[i].Passagem);
 
             for (int j = 0; j < 50; j++){
                 printf("-");
@@ -144,7 +194,7 @@ void CR(int assentos, Dados *cadastro){ //ler arquivo
     }
 }
 
-void MR(Dados *cadastro, int assentos){ // ler, escrever por cima / apagar e escrever no lugar
+void MR(Reserva *cadastro, int assentos){ // ler, escrever por cima / apagar e escrever no lugar
     char cpf[15], *nome, *sobrenome, assento_mod[4];
     int encontrado = 0;
 
@@ -166,7 +216,7 @@ void MR(Dados *cadastro, int assentos){ // ler, escrever por cima / apagar e esc
 
             printf("Classe: %s\n", cadastro[i].classe);
             printf("Trecho: %s %s\n", cadastro[i].origem, cadastro[i].destino);
-            printf("Valor %.2f\n", cadastro[i].valor);
+            printf("Passagem %.2f\n", cadastro[i].Passagem);
 
             for (int j = 0; j < 50; j++){
                 printf("-");
@@ -182,7 +232,7 @@ void MR(Dados *cadastro, int assentos){ // ler, escrever por cima / apagar e esc
     }
 }
 
-void CA(Dados *cadastro, int assentos){ // ler e apagar reserva
+void CA(Reserva *cadastro, int assentos){ // ler e apagar reserva
     char cpf[15];
     int encontrado = 0;
 
@@ -208,7 +258,7 @@ void CA(Dados *cadastro, int assentos){ // ler e apagar reserva
             strcpy(cadastro[i].idvoo, "");
             strcpy(cadastro[i].assento, "");
             strcpy(cadastro[i].classe, "");
-            cadastro[i].valor = 0.0;
+            cadastro[i].Passagem = 0.0;
 
             strcpy(cadastro[i].origem, "");
             strcpy(cadastro[i].destino, "");
@@ -224,10 +274,10 @@ void CA(Dados *cadastro, int assentos){ // ler e apagar reserva
 
 void FD(){ // RR inseridos no dia, antes do arquivo fechar
     
-    fclose(arquivo);
+    //fclose(arquivo);
 }
 
-void FV(Dados *cadastro, int assentos){ //imprimir todo o arquivo, fechar o arquivo e liberar memoria
+void FV(Reserva *cadastro, int assentos){ //imprimir todo o arquivo, fechar o arquivo e liberar memoria
     printf("Voo Fechado!\n");
 
     for (int i = 0; i < assentos; i++){
@@ -237,18 +287,18 @@ void FV(Dados *cadastro, int assentos){ //imprimir todo o arquivo, fechar o arqu
         printf("%s\n", cadastro[i].assento);
     }
 
-    float valor_total = 0;
+    float Passagem_total = 0;
     for (int k = 0; k < assentos; k++){
-        valor_total += cadastro[k].valor;
+        Passagem_total += cadastro[k].Passagem;
     }
 
-    printf("\nValor Total: %f\n", valor_total);
+    printf("\nPassagem Total: %f\n", Passagem_total);
 
     for (int j = 0; j < 50; j++){
         printf("-");
     }
 
-    fclose(arquivo);
+    //fclose(arquivo);
 
     for (int h = 0; h < assentos; h++){
 
@@ -267,56 +317,10 @@ void FV(Dados *cadastro, int assentos){ //imprimir todo o arquivo, fechar o arqu
         strcpy(cadastro[h].idvoo, "");
         strcpy(cadastro[h].assento, "");
         strcpy(cadastro[h].classe, "");
-        cadastro[h].valor = 0.0;
+        cadastro[h].Passagem = 0.0;
 
         strcpy(cadastro[h].origem, "");
         strcpy(cadastro[h].destino, "");
     }
     free(cadastro);
-}
-
-int main(void){
-    char comando[3];
-    int assentos;
-    Valor valores;
-    Dados *cadastro;
-    int cont = 0;
-
-    scanf("%s", comando);
-
-    if (strcmp(comando, "AV") == 0){
-        valores = AV(assentos);
-    }
-
-    do{
-        scanf("%s", comando);
-
-        if (strcmp(comando, "RR") == 0){
-            cadastro = (Dados *)aloca(sizeof(Dados), assentos);
-
-            RR(cadastro, cont, valores, assentos);
-            cont++;
-        }
-
-        if (strcmp(comando, "CR") == 0){
-            CR(assentos, cadastro);
-        }
-
-        if (strcmp(comando, "MR") == 0){
-            MR(cadastro, assentos);
-        }
-
-        if (strcmp(comando, "CA") == 0){
-            CA(cadastro, assentos);
-        }
-
-    } while (strcmp(comando, "FD") != 0 || strcmp(comando, "FV") != 0 || cont < assentos);
-
-    if (strcmp(comando, "FV") == 0 || cont >= assentos){
-        FV(cadastro, assentos);
-    } else if (strcmp(comando, "FD") == 0){
-        FD();
-    }
-
-    return 0;
 }
