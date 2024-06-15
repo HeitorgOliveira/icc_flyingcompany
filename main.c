@@ -43,7 +43,7 @@ void *aloca(int N, int J){
     return (p);
 }
 
-Valor AV(int *assentos){
+Valor AV(int *assentos){ // criar um novo arquivo
     Valor valores;
 
     scanf("%d %f %f", assentos, &valores.executiva, &valores.economica);
@@ -57,62 +57,67 @@ Valor AV(int *assentos){
     return valores;
 }
 
-void RR(Dados *cadastro, int cont, Valor valores){
+void RR(Dados *cadastro, int cont, Valor valores, int assentos){ // ler e escrever no arquivo
     char *p;
 
-    if (cadastro[cont].classe == 'executiva' && cadastro[cont].valor == valores.executiva ||
-        cadastro[cont].classe == 'economica' && cadastro[cont].valor == valores.economica){
+    if ((strcmp(cadastro[cont].classe, "executiva") == 0 && cadastro[cont].valor == valores.executiva) ||
+        (strcmp(cadastro[cont].classe, "economica") == 0 && cadastro[cont].valor == valores.economica)){
 
         if (cadastro[cont].dia == cadastro[0].dia && cadastro[cont].mes == cadastro[0].mes && cadastro[cont].ano == cadastro[0].ano &&
-            cadastro[cont].idvoo == cadastro[0].idvoo &&
-            cadastro[cont].origem == cadastro[0].origem && cadastro[cont].destino == cadastro[0].destino){
+            strcmp(cadastro[cont].idvoo, cadastro[0].idvoo) == 0 &&
+            strcmp(cadastro[cont].origem, cadastro[0].origem) == 0 && strcmp(cadastro[cont].destino, cadastro[0].destino) == 0){
+            
+            for(int i = 0; i < assentos; i++){
+                if(strcmp(cadastro[cont].assento, cadastro[i].assento) != 0){
+                    
+                    p = (char *)aloca(sizeof(char), 700);
+                    scanf(" %s", p);
+                    cadastro[cont].nome = (char *)aloca(sizeof(char), strlen(p) + 1);
+                    strcpy(cadastro[cont].nome, p);
+                    free(p);
 
-            p = (char *)aloca(sizeof(char), 700);
-            scanf(" %s", p);
-            cadastro[cont].nome = (char *)aloca(sizeof(char), strlen(p) + 1);
-            strcpy(cadastro[cont].nome, p);
-            free(p);
+                    p = (char *)aloca(sizeof(char), 700);
+                    scanf(" %s", p);
+                    cadastro[cont].sobrenome = (char *)aloca(sizeof(char), strlen(p) + 1);
+                    strcpy(cadastro[cont].sobrenome, p);
+                    free(p);
 
-            p = (char *)aloca(sizeof(char), 700);
-            scanf(" %s", p);
-            cadastro[cont].sobrenome = (char *)aloca(sizeof(char), strlen(p) + 1);
-            strcpy(cadastro[cont].sobrenome, p);
-            free(p);
+                    scanf(" %s", cadastro[cont].cpf);
 
-            scanf(" %s", cadastro[cont].cpf);
+                    scanf("%d %d %d", &cadastro[cont].dia, &cadastro[cont].mes, &cadastro[cont].ano);
 
-            scanf("%d %d %d", &cadastro[cont].dia, &cadastro[cont].mes, &cadastro[cont].ano);
+                    p = (char *)aloca(sizeof(char), 50);
+                    scanf(" %s", p);
+                    cadastro[cont].idvoo = (char *)aloca(sizeof(char), strlen(p) + 1);
+                    strcpy(cadastro[cont].idvoo, p);
+                    free(p);
 
-            p = (char *)aloca(sizeof(char), 50);
-            scanf(" %s", p);
-            cadastro[cont].idvoo = (char *)aloca(sizeof(char), strlen(p) + 1);
-            strcpy(cadastro[cont].idvoo, p);
-            free(p);
+                    scanf(" %s", cadastro[cont].assento);
 
-            scanf(" %s", cadastro[cont].assento);
+                    scanf(" %s", cadastro[cont].classe);
 
-            scanf(" %s", cadastro[cont].classe);
+                    scanf(" %f", &cadastro[cont].valor);
 
-            scanf(" %f", &cadastro[cont].valor);
+                    p = (char *)aloca(sizeof(char), 5);
+                    scanf(" %s", p);
+                    cadastro[cont].origem = (char *)aloca(sizeof(char), strlen(p) + 1);
+                    strcpy(cadastro[cont].origem, p);
+                    free(p);
 
-            p = (char *)aloca(sizeof(char), 5);
-            scanf(" %s", p);
-            cadastro[cont].origem = (char *)aloca(sizeof(char), strlen(p) + 1);
-            strcpy(cadastro[cont].origem, p);
-            free(p);
-
-            p = (char *)aloca(sizeof(char), 5);
-            scanf(" %s", p);
-            cadastro[cont].destino = (char *)aloca(sizeof(char), strlen(p) + 1);
-            strcpy(cadastro[cont].destino, p);
-            free(p);
+                    p = (char *)aloca(sizeof(char), 5);
+                    scanf(" %s", p);
+                    cadastro[cont].destino = (char *)aloca(sizeof(char), strlen(p) + 1);
+                    strcpy(cadastro[cont].destino, p);
+                    free(p);
+                }
+            }
         }
     } else {
         printf("Erro nos dados da reserva.\n");
     }
 }
 
-void CR(int assentos, Dados *cadastro){
+void CR(int assentos, Dados *cadastro){ //ler arquivo 
     char cpf[15];
 
     scanf("%s", cpf);
@@ -139,7 +144,7 @@ void CR(int assentos, Dados *cadastro){
     }
 }
 
-void MR(Dados *cadastro, int assentos){
+void MR(Dados *cadastro, int assentos){ // ler, escrever por cima / apagar e escrever no lugar
     char cpf[15], *nome, *sobrenome, assento_mod[4];
     int encontrado = 0;
 
@@ -177,7 +182,7 @@ void MR(Dados *cadastro, int assentos){
     }
 }
 
-void CA(Dados *cadastro, int assentos){
+void CA(Dados *cadastro, int assentos){ // ler e apagar reserva
     char cpf[15];
     int encontrado = 0;
 
@@ -217,11 +222,12 @@ void CA(Dados *cadastro, int assentos){
     }
 }
 
-void FD(){
-
+void FD(){ // RR inseridos no dia, antes do arquivo fechar
+    
+    fclose(arquivo);
 }
 
-void FV(Dados *cadastro, int assentos){
+void FV(Dados *cadastro, int assentos){ //imprimir todo o arquivo, fechar o arquivo e liberar memoria
     printf("Voo Fechado!\n");
 
     for (int i = 0; i < assentos; i++){
