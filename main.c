@@ -25,7 +25,7 @@ typedef struct{
 // Protótipo das Funções: tem que colocar os dados adquiridos no arquivo
 void *aloca(int N, int J);
 Valor AV(int *assentos);
-void RR(Dados *cadastro, int cont, Valor valores);
+void RR(Dados *cadastro, int cont, Valor valores, int assentos);
 void CR(int assentos, Dados *cadastro);
 void MR(Dados *cadastro, int assentos);
 void CA(Dados *cadastro, int assentos);
@@ -69,7 +69,7 @@ void RR(Dados *cadastro, int cont, Valor valores, int assentos){ // ler e escrev
             
             for(int i = 0; i < assentos; i++){
                 if(strcmp(cadastro[cont].assento, cadastro[i].assento) != 0){
-                    
+
                     p = (char *)aloca(sizeof(char), 700);
                     scanf(" %s", p);
                     cadastro[cont].nome = (char *)aloca(sizeof(char), strlen(p) + 1);
@@ -294,7 +294,7 @@ int main(void){
         if (strcmp(comando, "RR") == 0){
             cadastro = (Dados *)aloca(sizeof(Dados), assentos);
 
-            RR(cadastro, cont, valores);
+            RR(cadastro, cont, valores, assentos);
             cont++;
         }
 
