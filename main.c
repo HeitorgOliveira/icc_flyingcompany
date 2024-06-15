@@ -33,39 +33,35 @@ void FD(); // implementar FD
 void FV(Dados *cadastro, int assentos); 
 
 void* aloca(int N, int J){
-    void *p;
-
-    p= malloc(N*J);
+    void *p = malloc(N * J);
 
     if(p==NULL){
         printf("Sem espaço");
-
         exit(1);
     }
 
-return(p);
+    return(p);
 }
 
 Valor AV(int *assentos){
-    int assentos;
     Valor valores;
 
     scanf("%d %f %f", assentos, &valores.executiva, &valores.economica);
 
-    FILE *arquivo;
-    arquivo = fopen("info_voo.txt", "w");
+    FILE *arquivo = fopen("info_voo.txt", "w");
     if(arquivo == NULL){
         printf("Erro na abertura do arquivo!");
-        return(valores);
     }
 
     fclose(arquivo);
+    return valores;
 }
 
 void RR(Dados *cadastro, int cont, Valor valores){
     char *p;
 
-    if(cadastro[cont].classe == 'executiva' && cadastro[cont].valor == valores.executiva || cadastro[cont].classe == 'economica' && cadastro[cont].valor == valores.economica){
+    if( cadastro[cont].classe == 'executiva' && cadastro[cont].valor == valores.executiva || 
+        cadastro[cont].classe == 'economica' && cadastro[cont].valor == valores.economica){
         
         p = (char*)aloca(sizeof(char), 700);
         scanf(" %s", p);
@@ -106,6 +102,7 @@ void RR(Dados *cadastro, int cont, Valor valores){
         cadastro[cont].destino = (char*)aloca(sizeof(char), strlen(p)+1);
         strcpy(cadastro[cont].destino, p);
         free(p);
+
     } else {
         printf("Erro nos dados da reserva.\n");
     }
@@ -115,8 +112,6 @@ void CR(int assentos, Dados *cadastro){
     char cpf[15];
 
     scanf("%s", cpf);
-
-    printf("\n");
 
     for(int i = 0; i < assentos; i++){
         if(strcmp(cpf, cadastro[i].cpf) == 0){
@@ -133,6 +128,7 @@ void CR(int assentos, Dados *cadastro){
             for(int j=0; j<50; j++){
                 printf("-");
             }
+
             printf("\n");
             break;
         }
@@ -147,6 +143,7 @@ void MR(Dados *cadastro, int assentos){
 
     for(int i = 0; i < assentos; i++){
         if(strcmp(cpf, cadastro[i].cpf) == 0){
+            
             encontrado = 1;
 
             printf("Reserva Modificada:\n");
@@ -165,6 +162,7 @@ void MR(Dados *cadastro, int assentos){
             for(int j = 0; j < 50; j++){
                 printf("-");
             }
+
             printf("\n");
             break;
         }
@@ -183,20 +181,26 @@ void CA(Dados *cadastro, int assentos){
 
     for(int i = 0; i < assentos; i++){
         if(strcmp(cpf, cadastro[i].cpf) == 0){
+            
             encontrado = 1;
 
             strcpy(cadastro[i].cpf, "");
+
             free(cadastro[i].nome);
             cadastro[i].nome = NULL;
+
             free(cadastro[i].sobrenome);
             cadastro[i].sobrenome = NULL;
+
             cadastro[i].dia = 0;
             cadastro[i].mes = 0;
             cadastro[i].ano = 0;
+
             strcpy(cadastro[i].idvoo, "");
             strcpy(cadastro[i].assento, "");
             strcpy(cadastro[i].classe, "");
             cadastro[i].valor = 0.0;
+
             strcpy(cadastro[i].origem, "");
             strcpy(cadastro[i].destino, "");
 
@@ -233,6 +237,32 @@ void FV(Dados *cadastro, int assentos){
     for(int j = 0; j < 50; j++){
         printf("-");
     }
+
+    fclose(arquivo);
+
+    for (int h = 0; h < assentos; h++){
+
+        free(cadastro[h].nome);
+        cadastro[h].nome = NULL;
+
+        free(cadastro[h].sobrenome);
+        cadastro[h].sobrenome = NULL;
+
+        strcpy(cadastro[h].cpf, "");
+
+        cadastro[h].dia = 0;
+        cadastro[h].mes = 0;
+        cadastro[h].ano = 0;
+
+        strcpy(cadastro[h].idvoo, "");
+        strcpy(cadastro[h].assento, "");
+        strcpy(cadastro[h].classe, "");
+        cadastro[h].valor = 0.0;
+
+        strcpy(cadastro[h].origem, "");
+        strcpy(cadastro[h].destino, "");
+    }
+    free(cadastro);
 }
 
 int main(void){
@@ -242,11 +272,9 @@ int main(void){
     Dados *cadastro;
     int cont = 0;
     
-
     scanf("%s", comando);
 
     if(strcmp(comando, "AV") == 0){
-
         valores = AV(assentos);
     }
 
@@ -257,7 +285,6 @@ int main(void){
             cadastro = (Dados*)aloca(sizeof(Dados), assentos);
 
             RR(cadastro, cont, valores);
-
             cont++;
         }
 
@@ -275,12 +302,11 @@ int main(void){
 
     }while(strcmp(comando, "FD") != 0 || strcmp(comando, "FV") != 0 || cont < assentos);
 
-    if(strcmp(comando, "FV") == 0 || cont < assentos){
+    if(strcmp(comando, "FV") == 0 || cont >= assentos){
         FV(cadastro, assentos);
     } else if(strcmp(comando, "FD") == 0){
         FD();
     }
 
     return 0;
-    free();
 }
