@@ -25,11 +25,11 @@ typedef struct{
 //Protótipo das Funções:
 void *aloca(int N, int J);
 Valor AV(int *assentos); 
-void RR(Dados *cadastro, int cont);
+void RR(Dados *cadastro, int cont, Valor valores);
 void CR(int assentos, Dados *cadastro);
 void MR(Dados *cadastro, int assentos);
 void CA(Dados *cadastro, int assentos);
-void *FD(); // implementar FD
+void FD(); // implementar FD
 void FV(Dados *cadastro, int assentos); 
 
 void* aloca(int N, int J){
@@ -62,48 +62,53 @@ Valor AV(int *assentos){
     fclose(arquivo);
 }
 
-void RR(Dados *cadastro, int cont){
+void RR(Dados *cadastro, int cont, Valor valores){
     char *p;
 
-    p = (char*)aloca(sizeof(char), 700);
-    scanf(" %s", p);
-    cadastro[cont].nome = (char*)aloca(sizeof(char), strlen(p)+1);
-    strcpy(cadastro[cont].nome, p);
-    free(p);
+    if(cadastro[cont].classe == 'executiva' && cadastro[cont].valor == valores.executiva || cadastro[cont].classe == 'economica' && cadastro[cont].valor == valores.economica){
+        
+        p = (char*)aloca(sizeof(char), 700);
+        scanf(" %s", p);
+        cadastro[cont].nome = (char*)aloca(sizeof(char), strlen(p)+1);
+        strcpy(cadastro[cont].nome, p);
+        free(p);
 
-    p=(char*)aloca(sizeof(char), 700);
-    scanf(" %s", p);
-    cadastro[cont].sobrenome = (char*)aloca(sizeof(char), strlen(p)+1);
-    strcpy(cadastro[cont].sobrenome, p);
-    free(p);
+        p = (char*)aloca(sizeof(char), 700);
+        scanf(" %s", p);
+        cadastro[cont].sobrenome = (char*)aloca(sizeof(char), strlen(p)+1);
+        strcpy(cadastro[cont].sobrenome, p);
+        free(p);
 
-    scanf(" %s", cadastro[cont].cpf);
+        scanf(" %s", cadastro[cont].cpf);
 
-    scanf("%d %d %d", &cadastro[cont].dia,  &cadastro[cont].mes,  &cadastro[cont].ano);
+        scanf("%d %d %d", &cadastro[cont].dia,  &cadastro[cont].mes,  &cadastro[cont].ano);
 
-    p = (char*)aloca(sizeof(char), 50);
-    scanf(" %s", p);
-    cadastro[cont].idvoo = (char*)aloca(sizeof(char), strlen(p)+1);
-    strcpy(cadastro[cont].idvoo, p);
-    free(p);
+        p = (char*)aloca(sizeof(char), 50);
+        scanf(" %s", p);
+        cadastro[cont].idvoo = (char*)aloca(sizeof(char), strlen(p)+1);
+        strcpy(cadastro[cont].idvoo, p);
+        free(p);
 
-    scanf(" %s", cadastro[cont].assento);
+        scanf(" %s", cadastro[cont].assento);
 
-    scanf(" %s", cadastro[cont].classe);
+        scanf(" %s", cadastro[cont].classe);
 
-    scanf(" %f", &cadastro[cont].valor);
+        scanf(" %f", &cadastro[cont].valor);
 
-    p = (char*)aloca(sizeof(char), 5);
-    scanf(" %s", p);
-    cadastro[cont].origem = (char*)aloca(sizeof(char), strlen(p)+1);
-    strcpy(cadastro[cont].origem, p);
-    free(p);
+        p = (char*)aloca(sizeof(char), 5);
+        scanf(" %s", p);
+        cadastro[cont].origem = (char*)aloca(sizeof(char), strlen(p)+1);
+        strcpy(cadastro[cont].origem, p);
+        free(p);
 
-    p = (char*)aloca(sizeof(char), 5);
-    scanf(" %s", p);
-    cadastro[cont].destino = (char*)aloca(sizeof(char), strlen(p)+1);
-    strcpy(cadastro[cont].destino, p);
-    free(p);
+        p = (char*)aloca(sizeof(char), 5);
+        scanf(" %s", p);
+        cadastro[cont].destino = (char*)aloca(sizeof(char), strlen(p)+1);
+        strcpy(cadastro[cont].destino, p);
+        free(p);
+    } else {
+        printf("Erro nos dados da reserva.\n");
+    }
 }
 
 void CR(int assentos, Dados *cadastro){
@@ -232,16 +237,17 @@ void FV(Dados *cadastro, int assentos){
 
 int main(void){
     char comando[3];
+    int assentos;
+    Valor valores;
     Dados *cadastro;
     int cont = 0;
-    int assentos;
+    
 
     scanf("%s", comando);
 
     if(strcmp(comando, "AV") == 0){
-        Valor valores;
 
-        valores = AV(&assentos);
+        valores = AV(assentos);
     }
 
     do{
@@ -250,7 +256,7 @@ int main(void){
         if(strcmp(comando, "RR") == 0){
             cadastro = (Dados*)aloca(sizeof(Dados), assentos);
 
-            RR(cadastro, cont);
+            RR(cadastro, cont, valores);
 
             cont++;
         }
