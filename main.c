@@ -23,14 +23,14 @@ typedef struct{
 } Dados;
 
 //Protótipo das Funções:
-void * aloca(int N, int J);
+void *aloca(int N, int J);
 Valor AV(int *assentos); 
 void RR(Dados *cadastro, int cont);
 void CR(int assentos, Dados *cadastro);
 void MR(Dados *cadastro, int assentos);
 void CA(Dados *cadastro, int assentos);
 void *FD(); // implementar FD
-void *FV(); // implementar FV
+void FV(Dados *cadastro, int assentos); 
 
 void* aloca(int N, int J){
     void *p;
@@ -204,6 +204,32 @@ void CA(Dados *cadastro, int assentos){
     }
 }
 
+void FD(){
+    
+}
+
+void FV(Dados *cadastro, int assentos){
+    printf("Voo Fechado!\n");
+
+    for(int i = 0; i < assentos; i++){
+
+        printf("\n%s\n", cadastro[i].cpf);
+        printf("%s %s\n", cadastro[i].nome, cadastro[i].sobrenome);
+        printf("%s\n", cadastro[i].assento);
+    }
+
+    float valor_total = 0;
+    for(int k = 0; k < assentos; k++){
+        valor_total += cadastro[k].valor;
+    }
+
+    printf("\nValor Total: %f\n", valor_total);
+
+    for(int j = 0; j < 50; j++){
+        printf("-");
+    }
+}
+
 int main(void){
     char comando[3];
     Dados *cadastro;
@@ -242,6 +268,12 @@ int main(void){
         }
 
     }while(strcmp(comando, "FD") != 0 || strcmp(comando, "FV") != 0 || cont < assentos);
+
+    if(strcmp(comando, "FV") == 0 || cont < assentos){
+        FV(cadastro, assentos);
+    } else if(strcmp(comando, "FD") == 0){
+        FD();
+    }
 
     return 0;
     free();
