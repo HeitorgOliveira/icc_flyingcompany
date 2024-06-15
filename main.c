@@ -29,8 +29,8 @@ void RR(Dados *cadastro, int cont);
 void CR(int assentos, Dados *cadastro);
 void MR(Dados *cadastro, int assentos);
 void CA(Dados *cadastro, int assentos);
-void * FD(); // implementar FD
-void * FV(); // implementar FV
+void *FD(); // implementar FD
+void *FV(); // implementar FV
 
 void* aloca(int N, int J){
     void *p;
@@ -172,14 +172,35 @@ void MR(Dados *cadastro, int assentos){
 
 void CA(Dados *cadastro, int assentos){
     char cpf[15];
+    int encontrado = 0;
 
     scanf("%s", cpf);
 
     for(int i = 0; i < assentos; i++){
         if(strcmp(cpf, cadastro[i].cpf) == 0){
-            // cancelar essa reserva
+            encontrado = 1;
+
+            strcpy(cadastro[i].cpf, "");
+            free(cadastro[i].nome);
+            cadastro[i].nome = NULL;
+            free(cadastro[i].sobrenome);
+            cadastro[i].sobrenome = NULL;
+            cadastro[i].dia = 0;
+            cadastro[i].mes = 0;
+            cadastro[i].ano = 0;
+            strcpy(cadastro[i].idvoo, "");
+            strcpy(cadastro[i].assento, "");
+            strcpy(cadastro[i].classe, "");
+            cadastro[i].valor = 0.0;
+            strcpy(cadastro[i].origem, "");
+            strcpy(cadastro[i].destino, "");
+
             break;
         }
+    }
+
+    if(!encontrado){
+        printf("Reserva não encontrada.\n");
     }
 }
 
