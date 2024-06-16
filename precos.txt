@@ -1,3 +1,3 @@
 Capacidade: 100
-Economica: 200.00
-Executiva: 200.00
+Economica: 1200.00
+Executiva: 2000.00

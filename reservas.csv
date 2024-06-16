@@ -1,2 +1,2 @@
-nome, sobrenome, cpf, data, numero_voo, assento, classe, valor, origem, destino
-Heitor,Gomes,1234567890,12/02/2024,V001,A12,executiva,1200.00,SaoPaulo/Brasil,Miami/USA
+nome,sobrenome,cpf,data,numero_voo,assento,classe,valor,origem,destino
+isso,eh,um,teste,para,saber,se,100.00,tudo,bem
