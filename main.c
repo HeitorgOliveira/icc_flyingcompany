@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef char* string;
 
 typedef struct{
     float executiva;
@@ -10,31 +9,32 @@ typedef struct{
 } Passagem;
 
 typedef struct{
-    string nome;
-    string sobrenome;
-    string cpf;
-    string data;
+    char * nome;
+    char * sobrenome;
+    char * cpf;
+    char * data;
     int dia;
     int mes;
     int ano;
-    string num_voo;
-    string assento;
-    string classe;
+    char * num_voo;
+    char * assento;
+    char * classe;
     float valor;
-    string origem;
-    string destino;
+    char * origem;
+    char * destino;
 } Reserva;
 
 // Protótipo das Funções: tem que colocar os Reserva adquiridos no arquivo
 void *aloca(int N, int J);
 Reserva lerdados();
 void AV(int assentos, float Passagem_economica, float Passagem_executiva);
-void RR(string nome, string sobrenome, string cpf, string data, string numero_voo, string assento, string classe, float valor, string origem, string destino);
+void RR(Reserva reserva);
 void CR(int assentos, Reserva *cadastro);
 void MR(Reserva *cadastro, int assentos);
 void CA(Reserva *cadastro, int assentos);
 void FD(); // implementar FD
 void FV(Reserva *cadastro, int assentos);
+//void libertarreserva(Reserva *reserva);
 
 
 int main(void){
@@ -56,31 +56,15 @@ int main(void){
         scanf("%s", comando);
 
         if (strcmp(comando, "RR") == 0){
-            printf("AAAAA");
-            Reserva teste = lerdados();
-            printf("Nome: %s \nSobrenome: %s\nCPF: %s\nValor: %f\nData: %s", teste.nome, teste.sobrenome, teste.cpf, teste.valor, teste.data);
-            /*string nome, sobrenome, num_voo, origem, destino;
-            char cpf[15], assento[4], classe[10], data[11];
-            // Desculpe-me a ilegibilidade
-            nome = (string) malloc(100 * sizeof(string)); if (nome == NULL) { printf("Ponteiro vazio.\n"); return 1;}
-            sobrenome = (string) malloc(100 * sizeof(string)); if (sobrenome == NULL) { printf("Ponteiro vazio.\n"); return 1;}
-            num_voo = (string) malloc(100 * sizeof(string)); if (num_voo == NULL) { printf("Ponteiro vazio.\n"); return 1;}
-            origem = (string) malloc(100 * sizeof(string)); if (origem == NULL) { printf("Ponteiro vazio.\n"); return 1;}
-            destino = (string) malloc(100 * sizeof(string)); if (destino == NULL) { printf("Ponteiro vazio.\n"); return 1;}
-            float valor;
-            scanf(" %s %s %s %s %s %s %s %f %s %s", nome, sobrenome, cpf, data, num_voo, assento, classe, &valor, origem, destino);
-            nome = (string) realloc(nome, sizeof(string) * (strlen(nome)+1)); if (nome == NULL) { printf("Ponteiro vazio.\n"); return 1;}
-            sobrenome = (string) realloc(sobrenome, sizeof(string) * (strlen(sobrenome)+1)); if (sobrenome == NULL) { printf("Ponteiro vazio.\n"); return 1;}
-            num_voo = (string) realloc(num_voo, sizeof(string) * (strlen(num_voo))+1); if (num_voo == NULL) { printf("Ponteiro vazio.\n"); return 1;}
-            origem = (string) realloc(origem, sizeof(string) * (sizeof(origem)+1)); if (origem == NULL) { printf("Ponteiro vazio.\n"); return 1;}
-            destino = (string) realloc(destino, sizeof(string) * (strlen(destino)+1));  if (destino == NULL) { printf("Ponteiro vazio.\n"); return 1;}
-            printf("Nome: %s\nTamanho de nome: %i\nTamanho em bits(bytes?): %i", nome, strlen(nome), sizeof(string) * sizeof(nome));*/
-
-
+            Reserva reserva = lerdados();
             /*cadastro = (Reserva *)aloca(sizeof(Reserva), assentos);
-
+            
             RR(cadastro, cont, Passagemes, assentos);
             cont++;*/
+            printf("TESTE DOS DADOS \n\n\nNome: %s\nSobrenome: %s\nCPF: %s\nData: %s\nNum_voo: %s\nClasse: %s\nAssento: %s\nValor: %.2f\nOrigem: %s\nDestino: %s\n"
+            ,reserva.nome, reserva.sobrenome, reserva.cpf, reserva.data, reserva.num_voo, reserva.classe, reserva.assento, reserva.valor, reserva.origem, reserva.destino);
+            RR(reserva);
+            //libertarreserva(&reserva);
         }
 
         if (strcmp(comando, "CR") == 0){
@@ -109,29 +93,27 @@ int main(void){
 Reserva lerdados()
 {
     float valor;
-    string nome, sobrenome, num_voo, origem, destino, cpf, assento, classe, data;
+    char *nome, *sobrenome, *num_voo, *origem, *destino, *cpf, *assento, *classe, *data;
     // Desculpe-me a ilegibilidade
-    nome = (string) malloc(100 * sizeof(string)); if (nome == NULL) { printf("Ponteiro vazio.\n"); exit(1);}
-    cpf = (string) malloc(15 * sizeof(string)); if (cpf == NULL) { printf("Ponteiro vazio.\n"); exit(1);}
-    assento = (string) malloc(4 * sizeof(string)); if (assento == NULL) { printf("Ponteiro vazio.\n"); exit(1);}
-    classe = (string) malloc(10 * sizeof(string)); if (classe == NULL) { printf("Ponteiro vazio.\n"); exit(1);}
-    data = (string) malloc(11 * sizeof(string)); if (data == NULL) { printf("Ponteiro vazio.\n"); exit(1);}
-    sobrenome = (string) malloc(100 * sizeof(string)); if (sobrenome == NULL) { printf("Ponteiro vazio.\n");exit(1);}
-    num_voo = (string) malloc(100 * sizeof(string)); if (num_voo == NULL) { printf("Ponteiro vazio.\n");exit(1);}
-    origem = (string) malloc(100 * sizeof(string)); if (origem == NULL) { printf("Ponteiro vazio.\n");exit(1);}
-    destino = (string) malloc(100 * sizeof(string)); if (destino == NULL) { printf("Ponteiro vazio.\n");exit(1);;}
+    nome = (char *) malloc(100 * sizeof(char *)); if (nome == NULL) { printf("Ponteiro vazio.\n"); exit(1);}
+    cpf = (char *) malloc(15 * sizeof(char *)); if (cpf == NULL) { printf("Ponteiro vazio.\n"); exit(1);}
+    assento = (char *) malloc(4 * sizeof(char *)); if (assento == NULL) { printf("Ponteiro vazio.\n"); exit(1);}
+    classe = (char *) malloc(10 * sizeof(char *)); if (classe == NULL) { printf("Ponteiro vazio.\n"); exit(1);}
+    data = (char *) malloc(11 * sizeof(char *)); if (data == NULL) { printf("Ponteiro vazio.\n"); exit(1);}
+    sobrenome = (char *) malloc(100 * sizeof(char *)); if (sobrenome == NULL) { printf("Ponteiro vazio.\n");exit(1);}
+    num_voo = (char *) malloc(100 * sizeof(char *)); if (num_voo == NULL) { printf("Ponteiro vazio.\n");exit(1);}
+    origem = (char *) malloc(100 * sizeof(char *)); if (origem == NULL) { printf("Ponteiro vazio.\n");exit(1);}
+    destino = (char *) malloc(100 * sizeof(char *)); if (destino == NULL) { printf("Ponteiro vazio.\n");exit(1);}
+
     scanf(" %s %s %s %s %s %s %s %f %s %s", nome, sobrenome, cpf, data, num_voo, assento, classe, &valor, origem, destino);
-    nome = (string) realloc(nome, sizeof(string) * (strlen(nome)+1)); if (nome == NULL) { printf("Ponteiro vazio.\n");exit(1);}
-    sobrenome = (string) realloc(sobrenome, sizeof(string) * (strlen(sobrenome)+1)); if (sobrenome == NULL) { printf("Ponteiro vazio.\n");exit(1);}
-    num_voo = (string) realloc(num_voo, sizeof(string) * (strlen(num_voo))+1); if (num_voo == NULL) { printf("Ponteiro vazio.\n");exit(1);}
-    origem = (string) realloc(origem, sizeof(string) * (sizeof(origem)+1)); if (origem == NULL) { printf("Ponteiro vazio.\n");exit(1);}
-    destino = (string) realloc(destino, sizeof(string) * (strlen(destino)+1));  if (destino == NULL) { printf("Ponteiro vazio.\n");exit(1);}
+    
     Reserva reserva;
     reserva.nome = nome;
     reserva.sobrenome = sobrenome;
     reserva.cpf = cpf;
     reserva.data = data;
     reserva.num_voo = num_voo;
+    reserva.classe = classe;
     reserva.assento = assento;
     reserva.origem = origem;
     reserva.destino = destino;
@@ -139,7 +121,7 @@ Reserva lerdados()
     return reserva;
 }
 
-void *aloca(int N, int J){
+/*void *aloca(int N, int J){
     void *p = malloc(N * J);
 
     if (p == NULL){
@@ -148,12 +130,13 @@ void *aloca(int N, int J){
     }
 
     return (p);
-}
+}*/
 
 void AV(int assentos, float Passagem_economica, float Passagem_executiva){ // criar um novo arquivo
 
     printf("Assentos: %d\nPassagem executiva: %f\nPassagem economica: %f\n", assentos, Passagem_executiva, Passagem_economica);
     FILE *arquivo_precos = fopen("precos.txt", "w");
+    FILE *arquivo_reservas = fopen("reservas.csv", "w");
     if (arquivo_precos == NULL){
         printf("Erro na abertura do arquivo!\n");
         exit(1);
@@ -162,14 +145,25 @@ void AV(int assentos, float Passagem_economica, float Passagem_executiva){ // cr
     Passagemes.economica = Passagem_economica;
     Passagemes.executiva = Passagem_executiva;
     fprintf(arquivo_precos, "Economica: %.2f\nExecutiva: %.2f", Passagem_economica, Passagem_executiva);
+    fprintf(arquivo_reservas, "nome, sobrenome, cpf, data, numero_voo, assento, classe, valor, origem, destino");
     fclose(arquivo_precos);
+    fclose(arquivo_reservas);
 }
 
-void RR(string nome, string sobrenome, string cpf, string data, string numero_voo, string assento, string classe, float valor, string origem, string destino)
+void RR(Reserva reserva)
 { // ler e escrever no arquivo
-    string p;
+    FILE *arquivo_reservas = fopen("reservas.csv", "a");
+    if (arquivo_reservas == NULL)
+    {
+        printf("Arquivo reservas não abriu\n");
+        exit(1);
+    }
+    fprintf(arquivo_reservas, "\n%s, %s, %s, %s, %s, %s, %s, %.2f, %s, %s", reserva.nome, reserva.sobrenome
+    , reserva.cpf, reserva.data, reserva.num_voo, reserva.assento, reserva.classe, reserva.valor, reserva.origem, reserva.destino);
+    fclose(arquivo_reservas);
+    /*char * p;
 
-    /*if ((strcmp(cadastro[cont].classe, "executiva") == 0 && cadastro[cont].Passagem == Passagemes.executiva) ||
+    if ((strcmp(cadastro[cont].classe, "executiva") == 0 && cadastro[cont].Passagem == Passagemes.executiva) ||
         (strcmp(cadastro[cont].classe, "economica") == 0 && cadastro[cont].Passagem == Passagemes.economica)){
 
         if (cadastro[cont].dia == cadastro[0].dia && cadastro[cont].mes == cadastro[0].mes && cadastro[cont].ano == cadastro[0].ano &&
@@ -179,15 +173,15 @@ void RR(string nome, string sobrenome, string cpf, string data, string numero_vo
             for(int i = 0; i < assentos; i++){
                 if(strcmp(cadastro[cont].assento, cadastro[i].assento) != 0){
 
-                    p = (string )aloca(sizeof(char), 700);
+                    p = (char * )aloca(sizeof(char), 700);
                     scanf(" %s", p);
-                    cadastro[cont].nome = (string )aloca(sizeof(char), strlen(p) + 1);
+                    cadastro[cont].nome = (char * )aloca(sizeof(char), strlen(p) + 1);
                     strcpy(cadastro[cont].nome, p);
                     free(p);
 
-                    p = (string )aloca(sizeof(char), 700);
+                    p = (char * )aloca(sizeof(char), 700);
                     scanf(" %s", p);
-                    cadastro[cont].sobrenome = (string )aloca(sizeof(char), strlen(p) + 1);
+                    cadastro[cont].sobrenome = (char * )aloca(sizeof(char), strlen(p) + 1);
                     strcpy(cadastro[cont].sobrenome, p);
                     free(p);
 
@@ -195,9 +189,9 @@ void RR(string nome, string sobrenome, string cpf, string data, string numero_vo
 
                     scanf("%d %d %d", &cadastro[cont].dia, &cadastro[cont].mes, &cadastro[cont].ano);
 
-                    p = (string )aloca(sizeof(char), 50);
+                    p = (char * )aloca(sizeof(char), 50);
                     scanf(" %s", p);
-                    cadastro[cont].num_voo = (string )aloca(sizeof(char), strlen(p) + 1);
+                    cadastro[cont].num_voo = (char * )aloca(sizeof(char), strlen(p) + 1);
                     strcpy(cadastro[cont].num_voo, p);
                     free(p);
 
@@ -207,15 +201,15 @@ void RR(string nome, string sobrenome, string cpf, string data, string numero_vo
 
                     scanf(" %f", &cadastro[cont].Passagem);
 
-                    p = (string )aloca(sizeof(char), 5);
+                    p = (char * )aloca(sizeof(char), 5);
                     scanf(" %s", p);
-                    cadastro[cont].origem = (string )aloca(sizeof(char), strlen(p) + 1);
+                    cadastro[cont].origem = (char * )aloca(sizeof(char), strlen(p) + 1);
                     strcpy(cadastro[cont].origem, p);
                     free(p);
 
-                    p = (string )aloca(sizeof(char), 5);
+                    p = (char * )aloca(sizeof(char), 5);
                     scanf(" %s", p);
-                    cadastro[cont].destino = (string )aloca(sizeof(char), strlen(p) + 1);
+                    cadastro[cont].destino = (char * )aloca(sizeof(char), strlen(p) + 1);
                     strcpy(cadastro[cont].destino, p);
                     free(p);
                 }
@@ -382,4 +376,26 @@ void FV(Reserva *cadastro, int assentos){ //imprimir todo o arquivo, fechar o ar
         strcpy(cadastro[h].destino, "");
     }
     free(cadastro);
+}
+
+void libertarreserva(Reserva *reserva)
+{
+    free(reserva->nome);
+    printf("1");
+    free(reserva->sobrenome);
+    printf("2");
+    free(reserva->cpf);
+    printf("3");
+    free(reserva->data);
+    printf("4");
+    free(reserva->num_voo);
+    printf("5");
+    free(reserva->assento);
+    printf("6");
+    free(reserva->classe);
+    printf("7");
+    free(reserva->origem);
+    printf("8");
+    free(reserva->destino);
+    printf("9");
 }

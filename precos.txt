@@ -1,2 +1,2 @@
-Economica: 1000.00
-Executiva: 1500.00
+Economica: 200.00
+Executiva: 200.00
