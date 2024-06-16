@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define MAX_RESERVAS 100
+
 
 typedef struct{
     float executiva;
@@ -24,18 +26,20 @@ typedef struct{
     char * destino;
 } Reserva;
 
-// Protótipo das Funções: tem que colocar os Reserva adquiridos no arquivo
 void *aloca(int N, int J);
-Reserva lerdados();
 void AV(int assentos, float Passagem_economica, float Passagem_executiva);
 void RR(Reserva reserva);
 void CR(char * cpf);
-Reserva find(char * cpf);
 void MR(Reserva *cadastro, int assentos);
 void CA(Reserva *cadastro, int assentos);
 void FD(); // implementar FD
-void FV(Reserva *cadastro, int assentos);
-//void libertarreserva(Reserva *reserva);
+void FV();
+void libertarreserva(Reserva *reserva);
+int findreserva(Reserva *reserva);
+int contreservas();
+int getcapacidade();
+Reserva lerdados();
+
 
 
 int main(void){
@@ -44,40 +48,49 @@ int main(void){
     Reserva *cadastro;
     int cont = 0;
 
-    scanf("%s", comando);
-
-    if (strcmp(comando, "AV") == 0){
-        int assentos;
-        float Passagem_economica, Passagem_executiva;
-        scanf("%d %f %f", &assentos, &Passagem_economica, &Passagem_executiva);
-        AV(assentos, Passagem_economica, Passagem_executiva);
-    }
-
-    do{
+    do
+    {
         scanf("%s", comando);
+
+        if (strcmp(comando, "AV") == 0){
+            int assentos;
+            float Passagem_economica, Passagem_executiva;
+            scanf("%d %f %f", &assentos, &Passagem_economica, &Passagem_executiva);
+            AV(assentos, Passagem_economica, Passagem_executiva);
+        }
 
         if (strcmp(comando, "RR") == 0){
             Reserva reserva = lerdados();
+            if (contreservas() >= getcapacidade())
+            {
+                printf("Capacidade máxima atingida\n");
+                FV();
+            }
             RR(reserva);
+            libertarreserva(&reserva);
         }
 
         if (strcmp(comando, "CR") == 0)
         {
-            Reserva reserva;
-            char * cpf;
-            cpf = (char *) malloc(sizeof(char) * 15);
-            if (cpf == NULL)
-            {
-                printf("Erro alocando memória de: CPF\n");
-                exit(1);
-            }
+            char cpf[15];
             scanf("%s", cpf);
             CR(cpf);
-            free(cpf);
+            return 0;
         }
 
         if (strcmp(comando, "MR") == 0){
             //MR(cadastro, assentos);
+            printf("%i\n", getcapacidade());
+            /*Reserva teste;
+            teste.cpf = "um";
+            teste.nome = "sera";
+            teste.sobrenome = "que";
+            teste.assento = "mudou?";
+            printf("%i\n", findreserva(&teste));
+            /*free(teste.nome);
+            free(teste.sobrenome);
+            free(teste.cpf);*/
+            return 0;
         }
 
         if (strcmp(comando, "CA") == 0){
@@ -94,6 +107,7 @@ int main(void){
 
     return 0;
 }
+
 
 Reserva lerdados()
 {
@@ -137,9 +151,42 @@ Reserva lerdados()
     return (p);
 }*/
 
+int getcapacidade()
+{
+    FILE *arquivo_precos = fopen("precos.txt", "r");
+    char linha[16];
+    fgets(linha, sizeof(linha), arquivo_precos);
+    char *token = strtok(linha, ": ");
+    char * lorem = token;
+
+    token = strtok(NULL, "\n");
+    float capacidade = atof(token);
+    return capacidade;
+}
+
+int contreservas()
+{
+    FILE *arquivo_reservas = fopen("reservas.csv", "r");
+    if (arquivo_reservas == NULL)
+    {
+        printf("Erro ao abrir o arquivo\n");
+        exit(1);
+    }
+    int cont = 0;
+    char linha[400];
+
+    if (fgets(linha, sizeof(linha), arquivo_reservas) == NULL)
+    {
+        printf("Arquivo sem cabeçalho\n");
+        exit(1);
+    }
+    while(fgets(linha, sizeof(linha), arquivo_reservas) != NULL)
+        cont++;
+    return cont;
+}
+
 void AV(int assentos, float Passagem_economica, float Passagem_executiva){ // criar um novo arquivo
 
-    printf("Assentos: %d\nPassagem executiva: %f\nPassagem economica: %f\n", assentos, Passagem_executiva, Passagem_economica);
     FILE *arquivo_precos = fopen("precos.txt", "w");
     FILE *arquivo_reservas = fopen("reservas.csv", "w");
     if (arquivo_precos == NULL){
@@ -149,7 +196,7 @@ void AV(int assentos, float Passagem_economica, float Passagem_executiva){ // cr
     Passagem Passagemes;
     Passagemes.economica = Passagem_economica;
     Passagemes.executiva = Passagem_executiva;
-    fprintf(arquivo_precos, "Economica: %.2f\nExecutiva: %.2f", Passagem_economica, Passagem_executiva);
+    fprintf(arquivo_precos, "Capacidade: %i\nEconomica: %.2f\nExecutiva: %.2f", assentos, Passagem_economica, Passagem_executiva);
     fprintf(arquivo_reservas, "nome, sobrenome, cpf, data, numero_voo, assento, classe, valor, origem, destino");
     fclose(arquivo_precos);
     fclose(arquivo_reservas);
@@ -225,6 +272,80 @@ void RR(Reserva reserva)
     }*/
 }
 
+int findreserva(Reserva *reserva)
+{
+    FILE *arquivo_reservas = fopen("reservas.csv", "r");
+    if (arquivo_reservas == NULL)
+    {
+        printf("Arquivo 'reservas.csv' não abriu\n");
+        exit(1);
+    }
+    char * cpf;
+    char *nome;
+    char *sobrenome;
+
+    Reserva aux;
+
+    cpf = reserva->cpf;
+    char linha[400];
+    if (fgets(linha, sizeof(linha), arquivo_reservas) == NULL)
+    {
+        printf("Arquivo sem cabeçalho\n");
+        exit(1);
+    }
+    while(fgets(linha, sizeof(linha), arquivo_reservas) != NULL)
+    {
+        linha[strcspn(linha, "\n")] = '\0';
+        printf("----------Linha:----------\n %s\n", linha);
+        char delimitador[] = ",";
+        char *resultado = strtok(linha, delimitador);
+        nome = resultado;
+
+        resultado = strtok(NULL, delimitador);
+        sobrenome = resultado;
+
+        resultado = strtok(NULL, delimitador);
+        cpf = resultado;
+
+        if (strcmp(cpf, reserva->cpf) == 0)
+        {
+            resultado = strtok(NULL, delimitador);
+            aux.data = resultado;
+
+            resultado = strtok(NULL, delimitador);
+            aux.num_voo = resultado;
+
+            resultado = strtok(NULL, delimitador);
+            aux.classe = resultado;
+
+            resultado = strtok(NULL, delimitador);
+            aux.valor = atof(resultado);
+
+            resultado = strtok(NULL, delimitador);
+            aux.origem = resultado;
+
+            resultado = strtok(NULL, delimitador);
+            aux.destino = resultado;
+
+            printf("AUX classe: %s\n", aux.classe);
+            
+            int i = 0;
+            while(linha[i] != '\0')
+            {
+                linha[i] = '\0';
+                i++;
+            }
+
+            fclose(arquivo_reservas);
+            FILE *arquivo_reservas = fopen("reservas.csv", "a");
+            fprintf(arquivo_reservas, "\n%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s", aux.nome, aux.sobrenome, aux.cpf, aux.data, aux.num_voo, aux.assento, aux.classe, aux.valor, aux.origem, aux.destino);
+            fclose(arquivo_reservas);
+            return 1;
+        }
+    }
+    fclose(arquivo_reservas);
+    return 0;
+}
 
 void CR(char *cpf)
 {
@@ -235,16 +356,6 @@ void CR(char *cpf)
         exit(1);
     }
     Reserva reserva;
-    reserva.nome = "";
-    reserva.sobrenome = "";
-    reserva.cpf = "";
-    reserva.data = "";
-    reserva.num_voo = "";
-    reserva.classe = "";
-    reserva.assento = "";
-    reserva.origem = "";
-    reserva.destino = "";
-    reserva.valor = 0;
 
     char linha[400];
     int encontrou = 0;
@@ -258,49 +369,39 @@ void CR(char *cpf)
         char delimitador[] = ",";
         char *resultado = strtok(linha, delimitador);
         reserva.nome = resultado;
-        //printf("Nome: %s\n", reserva.nome);
 
         resultado = strtok(NULL, delimitador);
         reserva.sobrenome = resultado;
-        //printf("Sobrenome: %s\n", reserva.sobrenome);
 
         resultado = strtok(NULL, delimitador);
         reserva.cpf = resultado;
-        //printf("CPF: %s\n", reserva.cpf);
 
         if (strcmp(reserva.cpf, cpf) == 0)
         {
             resultado = strtok(NULL, delimitador);
             reserva.data = resultado;
-            //printf("Data: %s\n", reserva.data);
 
             resultado = strtok(NULL, delimitador);
             reserva.num_voo = resultado;
-            //printf("num_voo: %s\n", reserva.num_voo);
 
 
             resultado = strtok(NULL, delimitador);
             reserva.assento = resultado;
-            //printf("assento: %s\n", reserva.assento);
 
             resultado = strtok(NULL, delimitador);
             reserva.classe = resultado;
-            //printf("classe: %s\n", reserva.classe);
 
             resultado = strtok(NULL, delimitador);
             reserva.valor = atof(resultado);
-            //printf("valor: %.2f\n", reserva.valor);
 
             resultado = strtok(NULL, delimitador);
             reserva.origem = resultado;
-            //printf("origem: %s\n", reserva.origem);
 
             resultado = strtok(NULL, delimitador);
             reserva.destino = resultado;
-            //printf("destino: %s\n", reserva.destino);
 
             printf("%s\n%s %s\n%s\nVoo:%s\n", reserva.cpf, reserva.nome, reserva.sobrenome, reserva.data, reserva.num_voo);
-            printf("Assento:%s\nClasse:%s\nTrecho:%s %s\nValor: %.2f\n", reserva.assento, reserva.classe, reserva.origem, reserva.destino, reserva.valor);
+            printf("Assento:%s\nClasse:%s\nTrecho:%s %s\nValor:%.2f\n", reserva.assento, reserva.classe, reserva.origem, reserva.destino, reserva.valor);
             fclose(arquivo_reservas);
             return;
         }
@@ -394,10 +495,10 @@ void FD(){ // RR inseridos no dia, antes do arquivo fechar
     //fclose(arquivo);
 }
 
-void FV(Reserva *cadastro, int assentos){ //imprimir todo o arquivo, fechar o arquivo e liberar memoria
+void FV(){ //imprimir todo o arquivo, fechar o arquivo e liberar memoria
     printf("Voo Fechado!\n");
 
-    for (int i = 0; i < assentos; i++){
+    /*for (int i = 0; i < assentos; i++){
 
         printf("\n%s\n", cadastro[i].cpf);
         printf("%s %s\n", cadastro[i].nome, cadastro[i].sobrenome);
@@ -405,9 +506,9 @@ void FV(Reserva *cadastro, int assentos){ //imprimir todo o arquivo, fechar o ar
     }
 
     float Passagem_total = 0;
-    /*for (int k = 0; k < assentos; k++){
+    for (int k = 0; k < assentos; k++){
         Passagem_total += cadastro[k].Passagem;
-    }*/
+    }
 
     printf("\nPassagem Total: %f\n", Passagem_total);
 
@@ -439,27 +540,18 @@ void FV(Reserva *cadastro, int assentos){ //imprimir todo o arquivo, fechar o ar
         strcpy(cadastro[h].origem, "");
         strcpy(cadastro[h].destino, "");
     }
-    free(cadastro);
+    free(cadastro);*/
 }
 
 void libertarreserva(Reserva *reserva)
 {
     free(reserva->nome);
-    printf("1");
     free(reserva->sobrenome);
-    printf("2");
     free(reserva->cpf);
-    printf("3");
     free(reserva->data);
-    printf("4");
     free(reserva->num_voo);
-    printf("5");
     free(reserva->assento);
-    printf("6");
     free(reserva->classe);
-    printf("7");
     free(reserva->origem);
-    printf("8");
     free(reserva->destino);
-    printf("9");
 }

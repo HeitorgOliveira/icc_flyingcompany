@@ -1,2 +1,3 @@
+Capacidade: 100
 Economica: 200.00
 Executiva: 200.00
