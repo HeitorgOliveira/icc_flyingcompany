@@ -13,7 +13,7 @@ typedef struct{
 typedef struct{
     char nome[100];
     char sobrenome[100];
-    char cpf[12];
+    char cpf[16];
     char data[11];
     int dia;
     int mes;
@@ -38,6 +38,7 @@ int findreserva(char *identificador);
 int contreservas();
 int getcapacidade();
 Reserva lerdados();
+Reserva *getdados();
 
 
 
@@ -66,40 +67,52 @@ int main(void){
             {
                 Reserva reserva = lerdados();
                 RR(reserva);
-                //libertarreserva(&reserva);
             }
         }
 
         //FEITA
         if (strcmp(comando, "CR") == 0)
         {
-            char cpf[15];
+            char cpf[16];
             scanf("%s", cpf);
             CR(cpf);
-            return 0;
         }
 
         //FEITA
         if (strcmp(comando, "MR") == 0){
-            char cpf[15], nome[100], sobrenome[100], novocpf[15], assento[15];
-            scanf(" %s %s %s %s %s", cpf, nome, sobrenome, novocpf, assento);
+            char cpf[16], nome[100], sobrenome[100], novocpf[20], assento[15], restocpf[6];
+            scanf(" %s %s %s %s", cpf, nome, sobrenome, novocpf);
+            scanf("%s %s", restocpf, assento);
+            strcat(novocpf, restocpf);
             MR(cpf, nome, sobrenome, novocpf, assento);
         }
 
         //FEITA
         if (strcmp(comando, "CA") == 0){
-            char cpf[15];
+            char cpf[16];
             scanf(" %s", cpf);
             CA(cpf);
         }
 
-    } while (strcmp(comando, "FD") != 0 || strcmp(comando, "FV") != 0 /*|| cont < assentos)*/);
+        /*if (strcmp(comando, "TS") == 0){
+            Reserva *teste = getdados();
+            for(int i = 0, tam = contreservas(); i < tam; i++)
+            {
+                printf("-----------Passageiro %i --------------\nNome: %s\nSobrenome: %s\nCPF: %s\nData: %s\nNumero voo: %s\nAssento: %s\nClasse: %s\nValor: %.2f\nOrigem: %s\nDestino: %s\n", i
+            ,teste[i].nome, teste[i].sobrenome, teste[i].cpf, teste[i].data, teste[i].num_voo, teste[i].assento, teste[i].classe, teste[i].valor, teste[i].origem, teste[i].destino);
 
-    /*if (strcmp(comando, "FV") == 0 || cont >= assentos){
-        FV(cadastro, assentos);
-    } else if (strcmp(comando, "FD") == 0){
-        FD();
-    }*/
+            }
+        }*/
+
+        if (strcmp(comando, "FV") == 0){
+            FV();
+            return 0;
+        } else if (strcmp(comando, "FD") == 0){
+            FD();
+            return 0;
+        }
+
+    } while (contreservas() <= getcapacidade());
 
     return 0;
 }
@@ -108,13 +121,20 @@ int main(void){
 Reserva lerdados()
 {
     float valor;
-    char nome[100], sobrenome[100], num_voo[5], origem[100], destino[100], cpf[15], assento[6], classe[15], data[11];
-    scanf(" %s %s %s %s %s %s %s %f %s %s", nome, sobrenome, cpf, data, num_voo, assento, classe, &valor, origem, destino);
+    char nome[100], sobrenome[100], num_voo[5], origem[100], destino[100], cpf[16], assento[6], classe[15], data[11];
+    int dia, mes, ano;
+    scanf(" %s %s %s %2d %2d %4d %s %s %s %f %s %s", nome, sobrenome, cpf, &dia, &mes, &ano, num_voo, assento, classe, &valor, origem, destino);
+    if ((dia > 28 && mes == 2) || (dia > 31) || (dia < 1 ) || (mes > 12) || (mes < 1) || (ano < 1914))
+    {
+        printf("Dia: %i\nMes: %i\nAno: %i\n", dia, mes, ano);
+        printf("Data inválida.\n");
+        exit(1);
+    }
     Reserva reserva;
+    sprintf(reserva.data, "%i/%i/%i", dia, mes,ano);
     strcpy(reserva.nome, nome);
     strcpy(reserva.sobrenome, sobrenome);
     strcpy(reserva.cpf, cpf);
-    strcpy(reserva.data, data);
     strcpy(reserva.num_voo, num_voo);
     strcpy(reserva.classe, classe);
     strcpy(reserva.assento, assento);
@@ -124,68 +144,82 @@ Reserva lerdados()
     return reserva;
 }
 
-int getcapacidade()
-{
-    FILE *arquivo_precos = fopen("precos.txt", "r");
-    char linha[16];
-    fgets(linha, sizeof(linha), arquivo_precos);
-    char *token = strtok(linha, ": ");
-    char * lorem = token;
-
-    token = strtok(NULL, "\n");
-    float capacidade = atof(token);
-    return capacidade;
-}
-
-int contreservas()
+Reserva *getdados()
 {
     FILE *arquivo_reservas = fopen("reservas.csv", "r");
     if (arquivo_reservas == NULL)
     {
-        printf("Erro ao abrir o arquivo\n");
+        printf("Erro ao abrir o arquivo reservas!\n");
         exit(1);
     }
-    int cont = 0;
-    char linha[400];
 
-    if (fgets(linha, sizeof(linha), arquivo_reservas) == NULL)
+    char linha[400];
+    int cont = 0;
+    int qtdreservas = contreservas();
+    Reserva *reservas = malloc(sizeof(Reserva) * qtdreservas);
+
+    if(fgets(linha, sizeof(linha), arquivo_reservas) == NULL)
     {
         printf("Arquivo sem cabeçalho\n");
         exit(1);
     }
     while(fgets(linha, sizeof(linha), arquivo_reservas) != NULL)
-        cont++;
-    return cont;
-}
-
-void AV(int assentos, float Passagem_economica, float Passagem_executiva){ // criar um novo arquivo
-
-    FILE *arquivo_precos = fopen("precos.txt", "w");
-    FILE *arquivo_reservas = fopen("reservas.csv", "w");
-    if (arquivo_precos == NULL){
-        printf("Erro na abertura do arquivo!\n");
-        exit(1);
-    }
-    Passagem Passagemes;
-    Passagemes.economica = Passagem_economica;
-    Passagemes.executiva = Passagem_executiva;
-    fprintf(arquivo_precos, "Capacidade: %i\nEconomica: %.2f\nExecutiva: %.2f", assentos, Passagem_economica, Passagem_executiva);
-    fprintf(arquivo_reservas, "nome,sobrenome,cpf,data,numero_voo,assento,classe,valor,origem,destino");
-    fclose(arquivo_precos);
-    fclose(arquivo_reservas);
-}
-
-void RR(Reserva reserva)
-{
-    FILE *arquivo_reservas = fopen("reservas.csv", "a");
-    if (arquivo_reservas == NULL)
     {
-        printf("Arquivo 'reservas.csv' não abriu\n");
-        exit(1);
+        linha[strcspn(linha, "\n")] = '\0';
+        char delim[] = ",";
+        char *token = strtok(linha, delim);
+        strcpy(reservas[cont].nome, token);
+
+        token = strtok(NULL, delim);
+        strcpy(reservas[cont].sobrenome, token);
+
+        token = strtok(NULL, delim);
+        strcpy(reservas[cont].cpf, token);
+
+        token = strtok(NULL, delim);
+        strcpy(reservas[cont].data, token);
+
+        token = strtok(NULL, delim);
+        strcpy(reservas[cont].num_voo, token);
+
+        token = strtok(NULL, delim);
+        strcpy(reservas[cont].assento, token);
+
+        token = strtok(NULL, delim);
+        strcpy(reservas[cont].classe, token);
+
+        token = strtok(NULL, delim);
+        reservas[cont].valor = atof(token);
+
+        token = strtok(NULL, delim);
+        strcpy(reservas[cont].origem, token);
+
+        token = strtok(NULL, delim);
+        strcpy(reservas[cont].destino, token);
+        
+        cont++;
     }
-    fprintf(arquivo_reservas, "\n%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s", reserva.nome, reserva.sobrenome
-    , reserva.cpf, reserva.data, reserva.num_voo, reserva.assento, reserva.classe, reserva.valor, reserva.origem, reserva.destino);
     fclose(arquivo_reservas);
+    return reservas;
+}
+
+int verificacao(Reserva verificar)
+{
+    Reserva *verificacao = getdados();
+    for(int i = 0, tam = contreservas(); i < tam; i++)
+    {
+        if (strcmp(verificar.cpf, verificacao[i].cpf) == 0)
+        {
+            printf("CPF já registrado, tente de novo por favor\n");
+            return 1;
+        }
+        if ((strcmp(verificar.assento, verificacao[i].assento) == 0) && (strcmp(verificar.classe, verificacao[i].classe) == 0))
+        {
+            printf("Assento e classe já estão ocupados por outro passageiro\n");
+            return 1;
+        }
+    }
+    return 0;
 }
 
 int findreserva(char * identificador)
@@ -228,6 +262,74 @@ int findreserva(char * identificador)
     }
     fclose(arquivo_reservas);
     return 0;
+}
+
+int getcapacidade()
+{
+    FILE *arquivo_precos = fopen("precos.txt", "r");
+    char linha[25];
+    fgets(linha, sizeof(linha), arquivo_precos);
+    char *token = strtok(linha, ": ");
+    char * lorem = token;
+
+    token = strtok(NULL, "\n");
+    float capacidade = atof(token);
+    return capacidade;
+}
+
+int contreservas()
+{
+    FILE *arquivo_reservas = fopen("reservas.csv", "r");
+    if (arquivo_reservas == NULL)
+    {
+        printf("Erro ao abrir o arquivo\n");
+        exit(1);
+    }
+    int cont = 0;
+    char linha[400];
+
+    if (fgets(linha, sizeof(linha), arquivo_reservas) == NULL)
+    {
+        printf("Arquivo sem cabeçalho\n");
+        exit(1);
+    }
+    while(fgets(linha, sizeof(linha), arquivo_reservas) != NULL)
+        cont++;
+    return cont;
+}
+
+void AV(int assentos, float Passagem_economica, float Passagem_executiva)
+{ 
+
+    FILE *arquivo_precos = fopen("precos.txt", "w");
+    FILE *arquivo_reservas = fopen("reservas.csv", "w");
+    if (arquivo_precos == NULL){
+        printf("Erro na abertura do arquivo!\n");
+        exit(1);
+    }
+    Passagem Passagemes;
+    Passagemes.economica = Passagem_economica;
+    Passagemes.executiva = Passagem_executiva;
+    fprintf(arquivo_precos, "Capacidade: %i\nEconomica: %.2f\nExecutiva: %.2f", assentos, Passagem_economica, Passagem_executiva);
+    fprintf(arquivo_reservas, "nome,sobrenome,cpf,data,numero_voo,assento,classe,valor,origem,destino");
+    fclose(arquivo_precos);
+    fclose(arquivo_reservas);
+}
+
+void RR(Reserva reserva)
+{
+    FILE *arquivo_reservas = fopen("reservas.csv", "a");
+
+    if (verificacao(reserva)) return;
+    
+    if (arquivo_reservas == NULL)
+    {
+        printf("Arquivo 'reservas.csv' não abriu\n");
+        exit(1);
+    }
+    fprintf(arquivo_reservas, "\n%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s", reserva.nome, reserva.sobrenome
+    , reserva.cpf, reserva.data, reserva.num_voo, reserva.assento, reserva.classe, reserva.valor, reserva.origem, reserva.destino);
+    fclose(arquivo_reservas);
 }
 
 void CR(char *cpf)
@@ -287,7 +389,7 @@ void CR(char *cpf)
             strcpy(reserva.destino, resultado);
 
             printf("%s\n%s %s\n%s\nVoo:%s\n", reserva.cpf, reserva.nome, reserva.sobrenome, reserva.data, reserva.num_voo);
-            printf("Assento:%s\nClasse:%s\nTrecho:%s %s\nValor:%.2f\n", reserva.assento, reserva.classe, reserva.origem, reserva.destino, reserva.valor);
+            printf("Assento:%s\nClasse:%s\nTrecho:%s %s\nValor:%.2f\n--------------------------------------------------\n", reserva.assento, reserva.classe, reserva.origem, reserva.destino, reserva.valor);
             fclose(arquivo_reservas);
             return;
         }
@@ -362,6 +464,10 @@ void MR(char *identificador, char *nome, char *sobrenome, char *novocpf, char *a
 
             token = strtok(NULL, delimitador);
             strcpy(reservas[cont].destino, token);
+
+            printf("Reserva modificada:\n%s\n%s %s\n%s\nVoo:%s\nAssento:%s\nClasse:%s\nTrecho:%s %s\nValor:%.2f\n--------------------------------------------------\n", reservas[cont].cpf,
+            reservas[cont].nome, reservas[cont].sobrenome, reservas[cont].data, reservas[cont].num_voo, reservas[cont].assento, reservas[cont].classe,
+            reservas[cont].origem, reservas[cont].destino, reservas[cont].valor);
             cont++;
         }
         else
@@ -406,7 +512,8 @@ void MR(char *identificador, char *nome, char *sobrenome, char *novocpf, char *a
     fclose(arquivo_reservasMR);
 }
 
-void CA(char *identificador){
+void CA(char *identificador)
+{
     if(!findreserva(identificador))
     {
         printf("CPF não encontrado!\n");
@@ -425,7 +532,7 @@ void CA(char *identificador){
     int cont = 0;
     char auxnome[100];
     char auxsobrenome[100];
-    char auxcpf[15];
+    char auxcpf[16];
 
     if (fgets(linha, sizeof(linha), arquivo_reservasCA) == NULL)
     {
@@ -470,7 +577,6 @@ void CA(char *identificador){
 
             token = strtok(NULL, delimitador);
             strcpy(reservas[cont].destino, token);            
-            printf("Cont: %i\nNome: %s\n", cont, reservas[cont].nome);
             cont++;
         }
     }
@@ -492,55 +598,32 @@ void CA(char *identificador){
     fclose(arquivo_reservasCA);
 }
 
-void FD(){ // RR inseridos no dia, antes do arquivo fechar
-    
-    //fclose(arquivo);
+void FD()
+{
+    printf("Fechamento do dia:\n");
+    int qtdreservas = contreservas();
+    float lucrobruto = 0;
+    Reserva *reservas = getdados();
+    printf("Quantidade de reservas: %i\n", qtdreservas);
+    for(int i = 0; i < qtdreservas; i++)
+    {
+        lucrobruto+= reservas[i].valor;
+    }
+    printf("Posição: %.2f\n", lucrobruto);
+    printf("--------------------------------------------------\n");
 }
 
-void FV(){ //imprimir todo o arquivo, fechar o arquivo e liberar memoria
-    printf("Voo Fechado!\n");
-
-    /*for (int i = 0; i < assentos; i++){
-
-        printf("\n%s\n", cadastro[i].cpf);
-        printf("%s %s\n", cadastro[i].nome, cadastro[i].sobrenome);
-        printf("%s\n", cadastro[i].assento);
+void FV()
+{
+    printf("Voo Fechado!\n\n");
+    Reserva *reservas = getdados();
+    float lucrobruto = 0;
+    int qtdreservas = contreservas();
+    for(int i = 0; i < qtdreservas; i++)
+    {
+        printf("%s\n%s %s\n%s\n\n", reservas[i].cpf, reservas[i].nome, reservas[i].sobrenome, reservas[i].assento);
+        lucrobruto += reservas[i].valor;
     }
-
-    float Passagem_total = 0;
-    for (int k = 0; k < assentos; k++){
-        Passagem_total += cadastro[k].Passagem;
-    }
-
-    printf("\nPassagem Total: %f\n", Passagem_total);
-
-    for (int j = 0; j < 50; j++){
-        printf("-");
-    }
-
-    //fclose(arquivo);
-
-    for (int h = 0; h < assentos; h++){
-
-        free(cadastro[h].nome);
-        cadastro[h].nome = NULL;
-
-        free(cadastro[h].sobrenome);
-        cadastro[h].sobrenome = NULL;
-
-        strcpy(cadastro[h].cpf, "");
-
-        cadastro[h].dia = 0;
-        cadastro[h].mes = 0;
-        cadastro[h].ano = 0;
-
-        strcpy(cadastro[h].num_voo, "");
-        strcpy(cadastro[h].assento, "");
-        strcpy(cadastro[h].classe, "");
-        //cadastro[h].Passagem = 0.0;
-
-        strcpy(cadastro[h].origem, "");
-        strcpy(cadastro[h].destino, "");
-    }
-    free(cadastro);*/
+    printf("Valor total: %.2f\n", lucrobruto);
+    printf("--------------------------------------------------\n");
 }
