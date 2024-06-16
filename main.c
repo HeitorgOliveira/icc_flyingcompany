@@ -29,7 +29,8 @@ void *aloca(int N, int J);
 Reserva lerdados();
 void AV(int assentos, float Passagem_economica, float Passagem_executiva);
 void RR(Reserva reserva);
-Reserva CR(char * cpf);
+void CR(char * cpf);
+Reserva find(char * cpf);
 void MR(Reserva *cadastro, int assentos);
 void CA(Reserva *cadastro, int assentos);
 void FD(); // implementar FD
@@ -63,17 +64,16 @@ int main(void){
         if (strcmp(comando, "CR") == 0)
         {
             Reserva reserva;
-            char * cepeefe;
-            cepeefe = (char *) malloc(sizeof(char) * 15);
-            if (cepeefe == NULL)
+            char * cpf;
+            cpf = (char *) malloc(sizeof(char) * 15);
+            if (cpf == NULL)
             {
                 printf("Erro alocando memória de: CPF\n");
                 exit(1);
             }
-            scanf("%s", cepeefe);
-            reserva = CR(cepeefe);
-            printf("%s\n", reserva.cpf);
-            free(cepeefe);
+            scanf("%s", cpf);
+            CR(cpf);
+            free(cpf);
         }
 
         if (strcmp(comando, "MR") == 0){
@@ -225,8 +225,9 @@ void RR(Reserva reserva)
     }*/
 }
 
-Reserva CR(char *cpf)
-{ //ler arquivo 
+
+void CR(char *cpf)
+{
     FILE *arquivo_reservas = fopen("reservas.csv", "r");
     if (arquivo_reservas == NULL)
     {
@@ -234,9 +235,18 @@ Reserva CR(char *cpf)
         exit(1);
     }
     Reserva reserva;
-    //memset(&reserva, 0, sizeof(reserva));
-    char linha[400], aux[400];
+    reserva.nome = "";
+    reserva.sobrenome = "";
+    reserva.cpf = "";
+    reserva.data = "";
+    reserva.num_voo = "";
+    reserva.classe = "";
+    reserva.assento = "";
+    reserva.origem = "";
+    reserva.destino = "";
+    reserva.valor = 0;
 
+    char linha[400];
     int encontrou = 0;
     if(fgets(linha, sizeof(linha), arquivo_reservas) == NULL)
     {
@@ -245,70 +255,60 @@ Reserva CR(char *cpf)
     while (fgets(linha, sizeof(linha), arquivo_reservas) != NULL)
     {
         linha[strcspn(linha, "\n")] = '\0';
-        //printf("Linha lida: %s\n", linha);
         char delimitador[] = ",";
         char *resultado = strtok(linha, delimitador);
         reserva.nome = resultado;
+        //printf("Nome: %s\n", reserva.nome);
 
         resultado = strtok(NULL, delimitador);
         reserva.sobrenome = resultado;
+        //printf("Sobrenome: %s\n", reserva.sobrenome);
 
         resultado = strtok(NULL, delimitador);
-        printf("%s", reserva.cpf);
+        reserva.cpf = resultado;
+        //printf("CPF: %s\n", reserva.cpf);
+
         if (strcmp(reserva.cpf, cpf) == 0)
         {
             resultado = strtok(NULL, delimitador);
             reserva.data = resultado;
+            //printf("Data: %s\n", reserva.data);
 
             resultado = strtok(NULL, delimitador);
             reserva.num_voo = resultado;
+            //printf("num_voo: %s\n", reserva.num_voo);
+
 
             resultado = strtok(NULL, delimitador);
             reserva.assento = resultado;
+            //printf("assento: %s\n", reserva.assento);
 
             resultado = strtok(NULL, delimitador);
             reserva.classe = resultado;
+            //printf("classe: %s\n", reserva.classe);
 
             resultado = strtok(NULL, delimitador);
             reserva.valor = atof(resultado);
+            //printf("valor: %.2f\n", reserva.valor);
 
             resultado = strtok(NULL, delimitador);
             reserva.origem = resultado;
+            //printf("origem: %s\n", reserva.origem);
 
             resultado = strtok(NULL, delimitador);
             reserva.destino = resultado;
+            //printf("destino: %s\n", reserva.destino);
 
+            printf("%s\n%s %s\n%s\nVoo:%s\n", reserva.cpf, reserva.nome, reserva.sobrenome, reserva.data, reserva.num_voo);
+            printf("Assento:%s\nClasse:%s\nTrecho:%s %s\nValor: %.2f\n", reserva.assento, reserva.classe, reserva.origem, reserva.destino, reserva.valor);
             fclose(arquivo_reservas);
-            return reserva;
+            return;
         }
     }
     if (!encontrou)
         printf("Não encontramos o CPF %s\n", cpf);
     fclose(arquivo_reservas);
-    /*char cpf[15];
-
-    scanf("%s", cpf);
-
-    for (int i = 0; i < assentos; i++){
-        if (strcmp(cpf, cadastro[i].cpf) == 0){
-
-            printf("%s\n", cadastro[i].cpf);
-            printf("%s %s\n", cadastro[i].nome, cadastro[i].sobrenome);
-            printf("%d/%d/%d\n", cadastro[i].dia, cadastro[i].mes, cadastro[i].ano);
-            printf("Voo: %s\n", cadastro[i].num_voo);
-            printf("Assento: %s\n", cadastro[i].assento);
-            printf("Classe: %s\n", cadastro[i].classe);
-            printf("Trecho: %s %s\n", cadastro[i].origem, cadastro[i].destino);
-            //printf("Passagem %.2f\n", cadastro[i].Passagem);
-
-            for (int j = 0; j < 50; j++){
-                printf("-");
-            }
-
-            printf("\n");
-            break;
-        }
-    }*/
+    return;
 }
 
 void MR(Reserva *cadastro, int assentos){ // ler, escrever por cima / apagar e escrever no lugar
