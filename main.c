@@ -155,7 +155,7 @@ void RR(Reserva reserva)
     FILE *arquivo_reservas = fopen("reservas.csv", "a");
     if (arquivo_reservas == NULL)
     {
-        printf("Arquivo reservas não abriu\n");
+        printf("Arquivo 'reservas.csv' não abriu\n");
         exit(1);
     }
     fprintf(arquivo_reservas, "\n%s, %s, %s, %s, %s, %s, %s, %.2f, %s, %s", reserva.nome, reserva.sobrenome
