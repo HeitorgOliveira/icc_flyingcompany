@@ -1,0 +1,11 @@
+nome,sobrenome,cpf,data,numero_voo,assento,classe,valor,origem,destino
+Jona,Massa,555.555.222-99,12/12/2024,V001,A01,executiva,2500.00,CGH,RAO
+Marcos,Pedra,333.555.333-93,12/12/2024,V001,C33,economica,1200.00,CGH,RAO
+Roberto,Porto,111.333.333-89,12/12/2024,V001,A12,executiva,2500.00,CGH,RAO
+Roberto,Neves,011.333.333-89,12/12/2024,V001,B12,executiva,2500.00,CGH,RAO
+Roberto,Chave,112.333.333-89,12/12/2024,V001,C12,executiva,2500.00,CGH,RAO
+Roberto,Alegria,113.333.333-89,12/12/2024,V001,D12,executiva,2500.00,CGH,RAO
+Roberto,Ruiz,114.333.333-89,12/12/2024,V001,E12,executiva,2500.00,CGH,RAO
+Roberto,Portela,115.333.333-89,12/12/2024,V001,F12,executiva,2500.00,CGH,RAO
+Roberto,Pires,116.333.333-89,12/12/2024,V001,G12,executiva,2500.00,CGH,RAO
+Roberto,Prates,117.333.333-89,12/12/2024,V001,H12,executiva,2500.00,CGH,RAO
