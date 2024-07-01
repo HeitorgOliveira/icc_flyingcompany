@@ -1,23 +1,24 @@
 /* Nome dos membros do grupo:
 Nome: Heitor Gomes de Oliveira No USP: 15458350
-Nome: Matheus Guilherme Ferreira Mendonca Learte No USP: 15522362
-Nome: Camila Piscioneri Magalhaes No USP: 15697249
 */
 
-
-// Incluímos as bibliotecas necessárias
+// Incluí as bibliotecas necessárias
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
 
 
-//Definimos as structs que serão usadas durante a execução do programa
+//Defini as structs que serão usadas durante a execução do programa
+
+//A primeira struct é a de passagens, que vai armazenar o preço das passagens
 typedef struct{
     float executiva;
     float economica;
 } Passagem;
 
+
+//Essa segunda struct armazena as reservas e seus dados necessários, como nome, cpf data do voo por exemplo
 typedef struct{
     char nome[100];
     char sobrenome[100];
@@ -31,23 +32,37 @@ typedef struct{
     char destino[100];
 } Reserva;
 
-//Definimos as funções que foram pedidas no documento, serão usadas duarante a execução do programa
+//Defini as funções que foram pedidas no documento, serão usadas duarante a execução do programa
+
+//A função de abertura do voo recebe o numero de assentos, passagem economica e passagem executiva que serão salvos em um arquivo 
 void AV(int assentos, float Passagem_economica, float Passagem_executiva);
-void RR(Reserva reserva);
+
+//A função realizar reserva recebe um ponteiro para uma reserva e adiciona no arquivo de reservas uma reserva nova. O ponteiro é liberado na main
+void RR(Reserva *reserva);
+
+//Consultar reserva irá receber um CPF e retornar os valores daquele CPF desejado, caso o cpf não exista, ele apenas printa CPF não encontrado
 void CR(char * cpf);
+
+//Modificar reserva recebe um CPF alvo e atualiza seu nome, sobrenome, cpf e assento.
 void MR(char *identificador, char* nome, char *sobrenome, char *novocpf, char*assento);
+
+//A função cancelar reserva recebe um CPf e o remove do arquivo de reservas
 void CA(char *cpf);
+
+//A função fim do dia irá encerrar o dia, exibir os dados das reservas cadastradas e encerrará o programa
 void FD();
+
+// função fim do voo irá encerrar o voo e exibir as reservas salvas
 void FV();
 
-/*Também criamos algumas funções utilitárias para ajudar a implementação. Dentre elas podemos contar as reservas criadas,
+/*Também criei algumas funções utilitárias para ajudar a implementação. Dentre elas podemos contar as reservas criadas,
 encontrar uma reserva especifica dado um CPF, podemos obter a capacidade informada pelo usuário, podemos ler dados e retornarmos
 um ponteiro para um array da struct Reserva e podemos ler os dados informados pelo usuario no caso de um cadastro de reserva*/
 int findreserva(char *identificador);
 int contreservas();
 int getcapacidade();
 int estafechado();
-Reserva lerdados();
+Reserva lerdados(Reserva * reserva);
 Reserva *getdados();
 
 int main(void){
@@ -72,8 +87,10 @@ int main(void){
             }
             else 
             {
-                Reserva reserva = lerdados();
-                RR(reserva);
+                Reserva *reserva = malloc(sizeof(Reserva));
+                lerdados(&reserva);
+                RR(&reserva);
+                free(reserva);
             }
         }
 
@@ -85,7 +102,7 @@ int main(void){
         }
 
         else if (strcmp(comando, "MR") == 0){
-            char cpf[16], nome[100], sobrenome[100], novocpf[20], assento[15], restocpf[6];
+            char cpf[16], nome[100], sobrenome[100], novocpf[20], assento[15];
             scanf(" %s %s %s %s %s", cpf, nome, sobrenome, novocpf, assento);
             MR(cpf, nome, sobrenome, novocpf, assento);
         }
@@ -115,7 +132,7 @@ int main(void){
 }
 
 //Aqui criamos uma struct Reserva com os dados que serao lidos e a retornamos para a funcao RR
-Reserva lerdados()
+Reserva lerdados(Reserva *reserva)
 {
     float valor;
     char nome[100], sobrenome[100], num_voo[5], origem[100], destino[100], cpf[16], assento[6], classe[15], data[11];
@@ -127,18 +144,17 @@ Reserva lerdados()
         printf("Data inválida.\n");
         exit(1);
     }
-    Reserva reserva;
-    sprintf(reserva.data, "%i/%i/%i", dia, mes,ano);
-    strcpy(reserva.nome, nome);
-    strcpy(reserva.sobrenome, sobrenome);
-    strcpy(reserva.cpf, cpf);
-    strcpy(reserva.num_voo, num_voo);
-    strcpy(reserva.classe, classe);
-    strcpy(reserva.assento, assento);
-    strcpy(reserva.origem, origem);
-    strcpy(reserva.destino, destino);
-    reserva.valor = valor;    
-    return reserva;
+    sprintf(reserva->data, "%i/%i/%i", dia, mes,ano);
+    strcpy(reserva->nome, nome);
+    strcpy(reserva->sobrenome, sobrenome);
+    strcpy(reserva->cpf, cpf);
+    strcpy(reserva->num_voo, num_voo);
+    strcpy(reserva->classe, classe);
+    strcpy(reserva->assento, assento);
+    strcpy(reserva->origem, origem);
+    strcpy(reserva->destino, destino);
+    reserva->valor = valor;
+    return;
 }
 
 //Aqui resgatamos os dados de todas as reservas cadastradas 
@@ -316,7 +332,7 @@ void AV(int assentos, float Passagem_economica, float Passagem_executiva)
     fclose(arquivo_reservas);
 }
 
-void RR(Reserva reserva)
+void RR(Reserva *reserva)
 {
     FILE *arquivo_reservas = fopen("reservas.csv", "a");
     
@@ -326,8 +342,7 @@ void RR(Reserva reserva)
         exit(1);
     }
     //Adicionamos a tabela reserva no arquivo CSV
-    fprintf(arquivo_reservas, "\n%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s", reserva.nome, reserva.sobrenome
-    , reserva.cpf, reserva.data, reserva.num_voo, reserva.assento, reserva.classe, reserva.valor, reserva.origem, reserva.destino);
+    fprintf(arquivo_reservas, "\n%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s", reserva->nome, reserva->sobrenome, reserva->cpf, reserva->data, reserva->num_voo, reserva->assento, reserva->classe, reserva->valor, reserva->origem, reserva->destino);
     fclose(arquivo_reservas);
 }
 
@@ -621,7 +636,7 @@ void FD()
 
 void FV()
 {
-    //{ Do comentário de FD()} Aqui também
+    // Aqui também estão algumas funções utilitarias para ajudar na função
     printf("Voo Fechado!\n\n");
     Reserva *reservas = getdados();
     float lucrobruto = 0;
@@ -634,4 +649,6 @@ void FV()
     printf("Valor total: %.2f\n", lucrobruto);
     printf("--------------------------------------------------\n");
     free(reservas);
+
+    return;
 }
