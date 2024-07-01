@@ -9,6 +9,7 @@ Nome: Camila Piscioneri Magalhaes No USP: 15697249
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 //Definimos as structs que serão usadas durante a execução do programa
@@ -45,6 +46,7 @@ um ponteiro para um array da struct Reserva e podemos ler os dados informados pe
 int findreserva(char *identificador);
 int contreservas();
 int getcapacidade();
+int estafechado();
 Reserva lerdados();
 Reserva *getdados();
 
@@ -54,14 +56,15 @@ int main(void){
     {
         scanf("%s", comando);
         //Checamos cada caso que o usuário pode pedir
-        if (strcmp(comando, "AV") == 0){
+        if (strcmp(comando, "AV") == 0)
+        {
             int assentos;
             float Passagem_economica, Passagem_executiva;
             scanf("%d %f %f", &assentos, &Passagem_economica, &Passagem_executiva);
             AV(assentos, Passagem_economica, Passagem_executiva);
         }
 
-        if (strcmp(comando, "RR") == 0){
+        else if (strcmp(comando, "RR") == 0){
             if (contreservas() >= getcapacidade())
             {
                 printf("Capacidade máxima atingida\n");
@@ -74,33 +77,36 @@ int main(void){
             }
         }
 
-        if (strcmp(comando, "CR") == 0)
+        else if (strcmp(comando, "CR") == 0)
         {
             char cpf[16];
             scanf("%s", cpf);
             CR(cpf);
         }
 
-        if (strcmp(comando, "MR") == 0){
+        else if (strcmp(comando, "MR") == 0){
             char cpf[16], nome[100], sobrenome[100], novocpf[20], assento[15], restocpf[6];
-            scanf(" %s %s %s %s", cpf, nome, sobrenome, novocpf);
-            scanf("%s %s", restocpf, assento);
-            strcat(novocpf, restocpf);
+            scanf(" %s %s %s %s %s", cpf, nome, sobrenome, novocpf, assento);
             MR(cpf, nome, sobrenome, novocpf, assento);
         }
 
-        if (strcmp(comando, "CA") == 0){
+        else if (strcmp(comando, "CA") == 0){
             char cpf[16];
             scanf(" %s", cpf);
             CA(cpf);
         }
 
-        if (strcmp(comando, "FV") == 0){
+        else if (strcmp(comando, "FV") == 0){
             FV();
             return 0;
-        } else if (strcmp(comando, "FD") == 0){
+        }
+        else if (strcmp(comando, "FD") == 0){
             FD();
             return 0;
+        }
+        else
+        {
+            printf("Comando inexistente.\nComando: %s\n", comando);
         }
 
     //Se o numero de reservas for maior que a capacidade o loop para, porem esse usuario não sera cadastrado devido a funcao RR, que chama FV nesse caso
@@ -241,7 +247,7 @@ int findreserva(char * identificador)
 //Aqui retornamos a capacidade máxima de reservas como um inteiro, para facilitar o acesso a esse dado
 int getcapacidade()
 {
-    FILE *arquivo_precos = fopen("precos.txt", "r");
+    FILE *arquivo_precos = fopen("precos.bin", "r");
     char linha[25];
     fgets(linha, sizeof(linha), arquivo_precos);
     char *token = strtok(linha, ": ");
@@ -250,6 +256,23 @@ int getcapacidade()
     token = strtok(NULL, "\n");
     float capacidade = atof(token);
     return capacidade;
+}
+
+int estafechado()
+{
+    FILE *arquivo_precos = fopen("precos.bin", "r");
+    char linha[25];
+    fgets(linha, sizeof(linha), arquivo_precos);
+    fgets(linha, sizeof(linha), arquivo_precos);
+    fgets(linha, sizeof(linha), arquivo_precos);
+    fgets(linha, sizeof(linha), arquivo_precos);
+
+    char *token = strtok(linha, ": ");
+    char * lorem = token;
+
+    token = strtok(NULL, ": ");
+    int aberto = atoi(token);
+    return aberto;
 }
 
 //Aqui retornamos o numero de reservas realizadas
@@ -277,7 +300,7 @@ int contreservas()
 void AV(int assentos, float Passagem_economica, float Passagem_executiva)
 { 
     //Aqui criamos o arquivo com as informações das reservas e criamos o cabeçalho do arquivo CSV que armazenará as reservas
-    FILE *arquivo_precos = fopen("precos.txt", "w");
+    FILE *arquivo_precos = fopen("precos.bin", "w");
     FILE *arquivo_reservas = fopen("reservas.csv", "w");
     if (arquivo_precos == NULL){
         printf("Erro na abertura do arquivo!\n");
@@ -286,7 +309,7 @@ void AV(int assentos, float Passagem_economica, float Passagem_executiva)
     Passagem Passagemes;
     Passagemes.economica = Passagem_economica;
     Passagemes.executiva = Passagem_executiva;
-    fprintf(arquivo_precos, "Capacidade: %i\nEconomica: %.2f\nExecutiva: %.2f", assentos, Passagem_economica, Passagem_executiva);
+    fprintf(arquivo_precos, "Capacidade: %i\nEconomica: %.2f\nExecutiva: %.2f\nFechado: 0", assentos, Passagem_economica, Passagem_executiva);
     //Veja que o cabeçalho segue o padrão de RR
     fprintf(arquivo_reservas, "nome,sobrenome,cpf,data,numero_voo,assento,classe,valor,origem,destino");
     fclose(arquivo_precos);
@@ -393,7 +416,7 @@ void MR(char *identificador, char *nome, char *sobrenome, char *novocpf, char *a
         exit(1);
     }
     int qtdreservas = contreservas();
-    Reserva reservas[qtdreservas];
+    Reserva *reservas = malloc(sizeof(Reserva) * qtdreservas);
     char *aux;
     char linha[400];
     int cont = 0;
@@ -489,6 +512,7 @@ void MR(char *identificador, char *nome, char *sobrenome, char *novocpf, char *a
     , reservas[i].cpf, reservas[i].data, reservas[i].num_voo, reservas[i].assento, reservas[i].classe, reservas[i].valor, reservas[i].origem, reservas[i].destino);
     }
     fclose(arquivo_reservasMR);
+    free(reservas);
 }
 
 void CA(char *identificador)
