@@ -1,23 +1,42 @@
-/* Nome dos membros do grupo:
-Nome: Heitor Gomes de Oliveira No USP: 15458350
-Nome: Matheus Guilherme Ferreira Mendonca Learte No USP: 15522362
-Nome: Camila Piscioneri Magalhaes No USP: 15697249
+/*
+Membros do grupo:
+Nome: Heitor Gomes de Oliveira. No USP: 15458350
+*/
+
+/*
+
+    Introdução:
+
+        O código presente é feito na linguagem de programação C e é responsável pelo cadastro e gerenciamento de reservas de avião.
+    
+    Propósito:
+
+        O projeto tem como propósito o estudo de conceitos da linguagem C como loops, verificações, declaração de variáveis.
+        uso de ponteiros, uso de alocação dinâmica, modularização por meio de funções, declaração e implementação de funções, estruturas e
+        armazenamento de dados com o uso de arquivos.
+
+        O propósito do código é a criação de uma interface que auxilie o gerenciamento de reservas de avião, exibição de dados e do lucro total
+
 */
 
 
-// Incluímos as bibliotecas necessárias
+// Incluí as bibliotecas necessárias
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
 
+// -------------------------------------------Structs--------------------------------------------------------|
 
-//Definimos as structs que serão usadas durante a execução do programa
+//Defini as structs que serão usadas durante a execução do programa
+//Essa primeira struct serve apenas para armazenar as informações dos preços das passagens
 typedef struct{
     float executiva;
     float economica;
 } Passagem;
 
+
+//A segunda struct armazena as informações da reserva, como nome, sobrenome, cpf etc.
 typedef struct{
     char nome[100];
     char sobrenome[100];
@@ -31,31 +50,53 @@ typedef struct{
     char destino[100];
 } Reserva;
 
-//Definimos as funções que foram pedidas no documento, serão usadas duarante a execução do programa
+// ----------------------------------------------------------------------------------------------------------|
+
+// ---------------------------------------Protótipos das funções---------------------------------------------|
+
+//Defini as funções que foram pedidas no documento, serão usadas duarante a execução do programa
+
+//A função AV é a de abertura de voo, que recebe o numero de assentos disponíveis e o preço de cada classe: economica e executiva nesta ordem.
+//Também são criados dois arquivos, o arquivo de reservas e o arquivo de preços
 void AV(int assentos, float Passagem_economica, float Passagem_executiva);
+
+//A função RR significa realizar reserva, e cria uma struct reserva com os dados necessários e insere no final do arquivo de reservas
 void RR(Reserva reserva);
+
+//A função Cr significa consultar reserva recebe um CPF e exibe os dados do CPF caso exista. Em caso de CPF inexistente, a função exibe um aviso
 void CR(char * cpf);
+
+//A função MR significa modificar reserva e recebe um CPF alvo, nome sobrenome, cpf e assento. Os dados após o CPF alvo serão os novos dados do cpf procurado caso exista. Em caso de CPF inxistente a função dará um aviso.
 void MR(char *identificador, char* nome, char *sobrenome, char *novocpf, char*assento);
+
+// A função CA significa cancelar reserva e deleta o CPF alvo da lisa de reservas do arquivo csv
 void CA(char *cpf);
+
+//A função FD significa fim do dia e exibe as reservas realizadas, exibe o lucro total e sai do programa.
 void FD();
+
+//A função FV significa fim do voo e exibe as reservas realizadas, exibe o lucro total e sai do programa, fechando o voo
 void FV();
 
-/*Também criamos algumas funções utilitárias para ajudar a implementação. Dentre elas podemos contar as reservas criadas,
-encontrar uma reserva especifica dado um CPF, podemos obter a capacidade informada pelo usuário, podemos ler dados e retornarmos
-um ponteiro para um array da struct Reserva e podemos ler os dados informados pelo usuario no caso de um cadastro de reserva*/
+/*Também criei algumas funções utilitárias para ajudar a implementação. Dentre elas pode-se contar as reservas criadas,
+encontrar uma reserva especifica dado um CPF, pode-se obter a capacidade informada pelo usuário, pode-se ler dados e retornar
+um ponteiro para um array da struct Reserva e é possivel ler os dados informados pelo usuario no caso de um cadastro de reserva*/
 int findreserva(char *identificador);
 int contreservas();
 int getcapacidade();
-int estafechado();
 Reserva lerdados();
 Reserva *getdados();
+
+// ----------------------------------------------------------------------------------------------------------|
+
+// -------------------------------------------------Main-----------------------------------------------------|
 
 int main(void){
     char comando[3];
     do
     {
-        scanf("%s", comando);
-        //Checamos cada caso que o usuário pode pedir
+        scanf(" %s", comando);
+        //cada caso que o usuário pode pedir foi checado
         if (strcmp(comando, "AV") == 0)
         {
             int assentos;
@@ -85,7 +126,7 @@ int main(void){
         }
 
         else if (strcmp(comando, "MR") == 0){
-            char cpf[16], nome[100], sobrenome[100], novocpf[20], assento[15], restocpf[6];
+            char cpf[16], nome[100], sobrenome[100], novocpf[20], assento[15];
             scanf(" %s %s %s %s %s", cpf, nome, sobrenome, novocpf, assento);
             MR(cpf, nome, sobrenome, novocpf, assento);
         }
@@ -106,21 +147,30 @@ int main(void){
         }
         else
         {
-            printf("Comando inexistente.\nComando: %s\n", comando);
+            ;
         }
 
     //Se o numero de reservas for maior que a capacidade o loop para, porem esse usuario não sera cadastrado devido a funcao RR, que chama FV nesse caso
     } while (contreservas() <= getcapacidade());
     return 0;
 }
+// ----------------------------------------------------------------------------------------------------------|
 
-//Aqui criamos uma struct Reserva com os dados que serao lidos e a retornamos para a funcao RR
+// ---------------------------------------Funções------------------------------------------------------------|
+
+//Aqui criei uma struct Reserva com os dados que serao lidos e a retornamos para a funcao RR
+
+// ---------------------------------------Ler dados----------------------------------------------------------|
+
+//A função ler dados terimina de ler os dados oferecidos pelo usuario via terminal e retorna uma struct Reserva que será usada posteriormente
 Reserva lerdados()
 {
+    //São definidos os valores da struct e lidos os valores do terminal
     float valor;
-    char nome[100], sobrenome[100], num_voo[5], origem[100], destino[100], cpf[16], assento[6], classe[15], data[11];
+    char nome[100], sobrenome[100], num_voo[5], origem[100], destino[100], cpf[16], assento[6], classe[15];
     int dia, mes, ano;
     scanf(" %s %s %s %2d %2d %4d %s %s %s %f %s %s", nome, sobrenome, cpf, &dia, &mes, &ano, num_voo, assento, classe, &valor, origem, destino);
+    //Há uma verificação de data inválida
     if ((dia > 28 && mes == 2) || (dia > 31) || (dia < 1 ) || (mes > 12) || (mes < 1) || (ano < 1914))
     {
         printf("Dia: %i\nMes: %i\nAno: %i\n", dia, mes, ano);
@@ -128,6 +178,7 @@ Reserva lerdados()
         exit(1);
     }
     Reserva reserva;
+    //A data informada é convertida para o formato DD/MM/AAAA
     sprintf(reserva.data, "%i/%i/%i", dia, mes,ano);
     strcpy(reserva.nome, nome);
     strcpy(reserva.sobrenome, sobrenome);
@@ -140,10 +191,16 @@ Reserva lerdados()
     reserva.valor = valor;    
     return reserva;
 }
+// ----------------------------------------------------------------------------------------------------------|
 
-//Aqui resgatamos os dados de todas as reservas cadastradas 
+// ---------------------------------------Get dados----------------------------------------------------------|
+
+
+//Na função getdados resgatei os dados de todas as reservas cadastradas para auxiliar em consultas futuras
 Reserva *getdados()
 {
+    //A função abre um ponteiro de leitura para o arquivo reservas.csv, onde estão armazenadas as reservas e retorna um ponteiro para as reservas
+    //A liberação da memória alocada fica a cargo da função que chamou getdados();
     FILE *arquivo_reservas = fopen("reservas.csv", "r");
     if (arquivo_reservas == NULL)
     {
@@ -161,6 +218,7 @@ Reserva *getdados()
         printf("Arquivo sem cabeçalho\n");
         exit(1);
     }
+    //Os dados são separados por vírgula e armazenados no conteudo do ponteiro para uma struct Reserva
     while(fgets(linha, sizeof(linha), arquivo_reservas) != NULL)
     {
         linha[strcspn(linha, "\n")] = '\0';
@@ -200,8 +258,12 @@ Reserva *getdados()
     fclose(arquivo_reservas);
     return reservas;
 }
+// ----------------------------------------------------------------------------------------------------------|
 
-//Aqui verificamos se o identificador (CPF) está cadastrado, se sim retorna 1, em caso contrário retorna 0;
+// --------------------------------------- Find reserva -----------------------------------------------------|
+
+
+//Na função findreserva() verifiquei se o identificador CPF está cadastrado, se sim retorna 1, em caso contrário retorna 0;
 int findreserva(char * identificador)
 {
     FILE *arquivo_reservas = fopen("reservas.csv", "r");
@@ -212,8 +274,6 @@ int findreserva(char * identificador)
     }
 
     char *cpf;
-    char *nome;
-    char *sobrenome;
     char linha[400];
 
     if (fgets(linha, sizeof(linha), arquivo_reservas) == NULL)
@@ -221,15 +281,14 @@ int findreserva(char * identificador)
         printf("Arquivo sem cabeçalho\n");
         exit(1);
     }
+    //Usa strtok para obter o CPF, caso não exista a função fecha o arquivo e retorna 0;
     while(fgets(linha, sizeof(linha), arquivo_reservas) != NULL)
     {
         linha[strcspn(linha, "\n")] = '\0';
         char delimitador[] = ",";
         char *resultado = strtok(linha, delimitador);
-        nome = resultado;
 
         resultado = strtok(NULL, delimitador);
-        sobrenome = resultado;
 
         resultado = strtok(NULL, delimitador);
         cpf = resultado;
@@ -243,39 +302,30 @@ int findreserva(char * identificador)
     fclose(arquivo_reservas);
     return 0;
 }
+// ----------------------------------------------------------------------------------------------------------|
 
-//Aqui retornamos a capacidade máxima de reservas como um inteiro, para facilitar o acesso a esse dado
+// --------------------------------------- Get Capacidade ---------------------------------------------------|
+
+
+//Na função getcapacidade é retornada a capacidade máxima de reservas como um inteiro, para facilitar o acesso a esse dado futuramente
 int getcapacidade()
 {
+    //É aberto um ponteiro para o arquivo de preços e retorna a capacidade máxima
     FILE *arquivo_precos = fopen("precos.bin", "r");
     char linha[25];
     fgets(linha, sizeof(linha), arquivo_precos);
     char *token = strtok(linha, ": ");
-    char * lorem = token;
 
     token = strtok(NULL, "\n");
     float capacidade = atof(token);
     return capacidade;
 }
+// ----------------------------------------------------------------------------------------------------------|
 
-int estafechado()
-{
-    FILE *arquivo_precos = fopen("precos.bin", "r");
-    char linha[25];
-    fgets(linha, sizeof(linha), arquivo_precos);
-    fgets(linha, sizeof(linha), arquivo_precos);
-    fgets(linha, sizeof(linha), arquivo_precos);
-    fgets(linha, sizeof(linha), arquivo_precos);
+// --------------------------------------- Cont Reservas ----------------------------------------------------|
 
-    char *token = strtok(linha, ": ");
-    char * lorem = token;
 
-    token = strtok(NULL, ": ");
-    int aberto = atoi(token);
-    return aberto;
-}
-
-//Aqui retornamos o numero de reservas realizadas
+//Na função contreservas retornei o numero de reservas realizadas para facilitar o uso de outras funções ao longo do codigo
 int contreservas()
 {
     FILE *arquivo_reservas = fopen("reservas.csv", "r");
@@ -296,28 +346,35 @@ int contreservas()
         cont++;
     return cont;
 }
+// ----------------------------------------------------------------------------------------------------------|
+
+// --------------------------------------- Abertura de voo --------------------------------------------------|
+
 
 void AV(int assentos, float Passagem_economica, float Passagem_executiva)
 { 
-    //Aqui criamos o arquivo com as informações das reservas e criamos o cabeçalho do arquivo CSV que armazenará as reservas
+    //Aqui criei o arquivo com as informações das reservas e criei o cabeçalho do arquivo CSV que armazenará as reservas e a capacidade do voo
     FILE *arquivo_precos = fopen("precos.bin", "w");
     FILE *arquivo_reservas = fopen("reservas.csv", "w");
     if (arquivo_precos == NULL){
         printf("Erro na abertura do arquivo!\n");
         exit(1);
     }
-    Passagem Passagemes;
-    Passagemes.economica = Passagem_economica;
-    Passagemes.executiva = Passagem_executiva;
-    fprintf(arquivo_precos, "Capacidade: %i\nEconomica: %.2f\nExecutiva: %.2f\nFechado: 0", assentos, Passagem_economica, Passagem_executiva);
-    //Veja que o cabeçalho segue o padrão de RR
+    fprintf(arquivo_precos, "Capacidade: %i\nEconomica: %.2f\nExecutiva: %.2f", assentos, Passagem_economica, Passagem_executiva);
+    //O cabeçalho segue o padrão de RR e das reservas, para facilitar o armazenamento de dados, decidi salvar em um formato de tabela ou planilha.
     fprintf(arquivo_reservas, "nome,sobrenome,cpf,data,numero_voo,assento,classe,valor,origem,destino");
     fclose(arquivo_precos);
     fclose(arquivo_reservas);
 }
+// ----------------------------------------------------------------------------------------------------------|
 
+// --------------------------------------- Realizar Reserva -------------------------------------------------|
+
+//A função realizar reserva recebe uma struct reserva para armazenar no arquivo CSV, a leitura dos dados foi feita pela função ler dados
 void RR(Reserva reserva)
 {
+    //Para facilitar a função de realizar reserva, fiz uma função auxiliar para receber os dados da reserva e chamei a função RR com esses dados já armazenados
+    //A função RR recebe os dados para realizar a reserva e usa a extensão append no arquivo para escrever uma nova reserva no arquivo
     FILE *arquivo_reservas = fopen("reservas.csv", "a");
     
     if (arquivo_reservas == NULL)
@@ -325,15 +382,21 @@ void RR(Reserva reserva)
         printf("Arquivo 'reservas.csv' não abriu\n");
         exit(1);
     }
-    //Adicionamos a tabela reserva no arquivo CSV
+    //Adicionei a tabela reserva no arquivo CSV
     fprintf(arquivo_reservas, "\n%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s", reserva.nome, reserva.sobrenome
     , reserva.cpf, reserva.data, reserva.num_voo, reserva.assento, reserva.classe, reserva.valor, reserva.origem, reserva.destino);
     fclose(arquivo_reservas);
 }
+// ----------------------------------------------------------------------------------------------------------|
+
+// --------------------------------------- Consultar Reserva ------------------------------------------------|
+
 
 void CR(char *cpf)
 {
-    // Aqui procuramos a reserva solicitada, dado seu CPF
+    //A função recebe um CPF como entrada e realiza iterações pelo arquivo procurando por um CPF que seja igual ao informado. caso acabe a iteraçãoe o CPF não foi encontrado
+    //notifica-se o usuário da inexistência do CPF requisitado
+
     FILE *arquivo_reservas = fopen("reservas.csv", "r");
     if (arquivo_reservas == NULL)
     {
@@ -348,6 +411,7 @@ void CR(char *cpf)
     {
         printf("Arquivo sem cabeçalho\n");
     }
+    //É feita uma iteração pelo arquivo CSV linha por linha e foi usada a função strtok, salvando cada dado do usuario separado por virgula.
     while (fgets(linha, sizeof(linha), arquivo_reservas) != NULL)
     {
         linha[strcspn(linha, "\n")] = '\0';
@@ -362,7 +426,8 @@ void CR(char *cpf)
         resultado = strtok(NULL, delimitador);
         strcpy(reserva.cpf, resultado);
 
-
+        //Os dados são copiados até chegar em CPF, que é comparado com o CPF alvo, em caso positivo os outros dados são exibidos, em caso negativo
+        //O loop continua
         if (strcmp(reserva.cpf, cpf) == 0)
         {
             resultado = strtok(NULL, delimitador);
@@ -399,11 +464,16 @@ void CR(char *cpf)
     fclose(arquivo_reservas);
     return;
 }
+// ----------------------------------------------------------------------------------------------------------|
 
+// --------------------------------------- Modificar Reserva ------------------------------------------------|
+
+//Modificar reserva recebe o CPF alvo que vai ser modificado. as outras entradas são os dados a serem alterados, sendo eles o nome, sobrenome,
+//o novo CPF e o novo assento. A função não retorna nenhum valor
 void MR(char *identificador, char *nome, char *sobrenome, char *novocpf, char *assento)
 {
-    /*O funcionamento desta função é interessante. Na verdade nenhum dado é modificado, o que realmente acontece é que apagamos a tabela
-    com os dados de todos os usuarios e escrevemos uma em que onde o usuario solicitado tem suas devidas alterações*/
+    /*O funcionamento desta função é interessante. Na verdade nenhum dado é modificado, eu apaguei a tabela
+    com os dados de todos os usuarios e escrevi uma outra onde o usuario solicitado tem suas devidas alterações*/
     if(!findreserva(identificador))
     {
         printf("CPF não encontrado");
@@ -417,7 +487,6 @@ void MR(char *identificador, char *nome, char *sobrenome, char *novocpf, char *a
     }
     int qtdreservas = contreservas();
     Reserva *reservas = malloc(sizeof(Reserva) * qtdreservas);
-    char *aux;
     char linha[400];
     int cont = 0;
 
@@ -426,6 +495,7 @@ void MR(char *identificador, char *nome, char *sobrenome, char *novocpf, char *a
         printf("Arquivo sem cabeçalho\n");
         exit(1);
     }
+    //No loop while são feitas as separações dos dados por vírgula, com o uso da função strtok 
     while (fgets(linha, sizeof(linha), arquivo_reservasMR) != NULL && (cont < qtdreservas))
     {
         linha[strcspn(linha, "\n")] = '\0';
@@ -466,7 +536,8 @@ void MR(char *identificador, char *nome, char *sobrenome, char *novocpf, char *a
 
             token = strtok(NULL, delimitador);
             strcpy(reservas[cont].destino, token);
-
+            
+            //São informadas ao usuário as modificações realizadas.
             printf("Reserva Modificada:\n%s\n%s %s\n%s\nVoo: %s\nAssento: %s\nClasse: %s\nTrecho: %s %s\nValor: %.2f\n--------------------------------------------------\n", reservas[cont].cpf,
             reservas[cont].nome, reservas[cont].sobrenome, reservas[cont].data, reservas[cont].num_voo, reservas[cont].assento, reservas[cont].classe,
             reservas[cont].origem, reservas[cont].destino, reservas[cont].valor);
@@ -499,6 +570,9 @@ void MR(char *identificador, char *nome, char *sobrenome, char *novocpf, char *a
     }
     fclose(arquivo_reservasMR);
 
+
+    //O arquivo é reescrito. Para isso o arquivo foi aberto no modo W, que reescreve o arquivo, é feito o cabeçalho da tabela e após isso
+    //Os usuários são cadastrados novamente.
     arquivo_reservasMR = fopen("reservas.csv", "w");
     if(arquivo_reservasMR == NULL)
     {
@@ -513,11 +587,16 @@ void MR(char *identificador, char *nome, char *sobrenome, char *novocpf, char *a
     }
     fclose(arquivo_reservasMR);
     free(reservas);
+    reservas = NULL;
 }
+// ----------------------------------------------------------------------------------------------------------|
+
+// --------------------------------------- Cancelar Reserva -------------------------------------------------|
+
 
 void CA(char *identificador)
 {
-    /*A função CA tem um funcionamento semelhante ao MR, ela apaga a tabela com as reservas e a reescreve sem o usuario que queremos deletar*/
+    /*A função CA tem um funcionamento semelhante ao MR, ela apaga a tabela com as reservas e a reescreve sem o usuario que quero deletar*/
     if(!findreserva(identificador))
     {
         printf("CPF não encontrado!\n");
@@ -531,7 +610,6 @@ void CA(char *identificador)
     }
     int qtdreservas = contreservas();
     Reserva reservas[qtdreservas];
-    char *aux;
     char linha[400];
     int cont = 0;
     char auxnome[100];
@@ -601,6 +679,10 @@ void CA(char *identificador)
     }
     fclose(arquivo_reservasCA);
 }
+// ----------------------------------------------------------------------------------------------------------|
+
+// ------------------------------------------ Fim do dia ----------------------------------------------------|
+
 
 void FD()
 {
@@ -617,11 +699,15 @@ void FD()
     printf("Posição: %.2f\n", lucrobruto);
     printf("--------------------------------------------------\n");
     free(reservas);
+    reservas = NULL;
 }
+// ----------------------------------------------------------------------------------------------------------|
+
+// --------------------------------------- Fechamento do voo ------------------------------------------------|
 
 void FV()
 {
-    //{ Do comentário de FD()} Aqui também
+    //Aqui também foram usadas as fuções auxiliares para facilitar o trabalho
     printf("Voo Fechado!\n\n");
     Reserva *reservas = getdados();
     float lucrobruto = 0;
@@ -634,4 +720,7 @@ void FV()
     printf("Valor total: %.2f\n", lucrobruto);
     printf("--------------------------------------------------\n");
     free(reservas);
+    reservas = NULL;
 }
+
+// ----------------------------------------------------------------------------------------------------------|
