@@ -12,7 +12,7 @@ Nome: Heitor Gomes de Oliveira No USP: 15458350
 // -------------------------------------------Structs--------------------------------------------------------|
 
 //Defini as structs que serão usadas durante a execução do programa
-//Essa primeira struct serve apenas para armazenar as infromações dos preços das passagens
+//Essa primeira struct serve apenas para armazenar as informações dos preços das passagens
 typedef struct{
     float executiva;
     float economica;
@@ -37,7 +37,7 @@ typedef struct{
 
 // ---------------------------------------Protótipos das funções---------------------------------------------|
 
-//Definimos as funções que foram pedidas no documento, serão usadas duarante a execução do programa
+//Defini as funções que foram pedidas no documento, serão usadas duarante a execução do programa
 
 //A função AV é a de abertura de voo, que recebe o numero de assentos disponíveis e o preço de cada classe: economica e executiva nesta ordem.
 //Também são criados dois arquivos, o arquivo de reservas e o arquivo de preços
@@ -61,9 +61,9 @@ void FD();
 //A função FV significa fim do voo e exibe as reservas realizadas, exibe o lucro total e sai do programa, fechando o voo
 void FV();
 
-/*Também criei algumas funções utilitárias para ajudar a implementação. Dentre elas podemos contar as reservas criadas,
-encontrar uma reserva especifica dado um CPF, podemos obter a capacidade informada pelo usuário, podemos ler dados e retornarmos
-um ponteiro para um array da struct Reserva e podemos ler os dados informados pelo usuario no caso de um cadastro de reserva*/
+/*Também criei algumas funções utilitárias para ajudar a implementação. Dentre elas pode-se contar as reservas criadas,
+encontrar uma reserva especifica dado um CPF, pode-se obter a capacidade informada pelo usuário, pode-se ler dados e retornar
+um ponteiro para um array da struct Reserva e é possivel ler os dados informados pelo usuario no caso de um cadastro de reserva*/
 int findreserva(char *identificador);
 int contreservas();
 int getcapacidade();
@@ -79,7 +79,7 @@ int main(void){
     do
     {
         scanf(" %s", comando);
-        //Checamos cada caso que o usuário pode pedir
+        //cada caso que o usuário pode pedir foi checado
         if (strcmp(comando, "AV") == 0)
         {
             int assentos;
@@ -168,7 +168,7 @@ Reserva lerdados()
     return reserva;
 }
 
-//Aqui resgatamos os dados de todas as reservas cadastradas 
+//Na função resgatei os dados de todas as reservas cadastradas para auxiliar em consultas futuras
 Reserva *getdados()
 {
     FILE *arquivo_reservas = fopen("reservas.csv", "r");
@@ -228,7 +228,7 @@ Reserva *getdados()
     return reservas;
 }
 
-//Aqui verificamos se o identificador (CPF) está cadastrado, se sim retorna 1, em caso contrário retorna 0;
+//Na função findereserva verifiquei se o identificador (CPF) está cadastrado, se sim retorna 1, em caso contrário retorna 0;
 int findreserva(char * identificador)
 {
     FILE *arquivo_reservas = fopen("reservas.csv", "r");
@@ -239,8 +239,6 @@ int findreserva(char * identificador)
     }
 
     char *cpf;
-    //char *nome;
-    //char *sobrenome;
     char linha[400];
 
     if (fgets(linha, sizeof(linha), arquivo_reservas) == NULL)
@@ -253,10 +251,8 @@ int findreserva(char * identificador)
         linha[strcspn(linha, "\n")] = '\0';
         char delimitador[] = ",";
         char *resultado = strtok(linha, delimitador);
-        //nome = resultado;
 
         resultado = strtok(NULL, delimitador);
-        //sobrenome = resultado;
 
         resultado = strtok(NULL, delimitador);
         cpf = resultado;
@@ -271,7 +267,7 @@ int findreserva(char * identificador)
     return 0;
 }
 
-//Aqui retornei a capacidade máxima de reservas como um inteiro, para facilitar o acesso a esse dado
+//Na função getcapacidade é retornada a capacidade máxima de reservas como um inteiro, para facilitar o acesso a esse dado futuramente
 int getcapacidade()
 {
     //É aberto um ponteiro para o arquivo de preços e retorna a capacidade máxima
@@ -285,7 +281,7 @@ int getcapacidade()
     return capacidade;
 }
 
-//Aqui retornei o numero de reservas realizadas para facilitar o uso de outras funções ao longo do codigo
+//Na função contreservas retornei o numero de reservas realizadas para facilitar o uso de outras funções ao longo do codigo
 int contreservas()
 {
     FILE *arquivo_reservas = fopen("reservas.csv", "r");
@@ -325,7 +321,7 @@ void AV(int assentos, float Passagem_economica, float Passagem_executiva)
 
 void RR(Reserva reserva)
 {
-    //Para facilitar a função de realizar reserva, fiz uma função auxiliar para receber os ddos da reserva e chamei a função RR com esses dados já armazenados
+    //Para facilitar a função de realizar reserva, fiz uma função auxiliar para receber os dados da reserva e chamei a função RR com esses dados já armazenados
     //A função RR recebe os dados para realizar a reserva e usa a extensão append no arquivo para escrever uma nova reserva no arquivo
     FILE *arquivo_reservas = fopen("reservas.csv", "a");
     
